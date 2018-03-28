@@ -109,3 +109,21 @@ class ModelLabEnv(object):
 		self.cache['models'][model_name] = Model()
 
 		sys.path.remove(full_model_dir)
+
+
+	def unload_model(self, model_name):
+
+		if self.cache['models'][model_name]:
+			del self.cache['models'][model_name]
+		else:
+			raise ValueError('Selected model is currently not loaded')
+
+
+	def train_model(self, model_name, training_set):
+
+		self.cache['models'][model_name].train(training_set)
+
+
+	def evaluate_model(self, model_name, text):
+
+		label = self.cache['models'][model_name].evaluate(text)
