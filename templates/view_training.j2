@@ -1,0 +1,8 @@
+<h1>Model lab</h1>
+
+Training Contents for {{ training_name }}:
+<ul>
+{% for example in training_content %}
+	<li><strong>{{ example.get('label') }}</strong> - {{ example.get('text') }}</li>
+{% endfor %}
+</ul>

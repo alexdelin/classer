@@ -25,7 +25,17 @@ env = ModelLabEnv()
 def fetch():
     """Main Route that displays the documentation"""
 
-    return send_from_directory('html', 'index.html')
+    training_list = env.list_training()
+    return render_template('index.j2', trainings=training_list)
+
+
+@app.route('/view/training/<path:path>', methods=['GET'])
+def view_training(path):
+    """Main Route that displays the documentation"""
+
+    training_content = env.get_training(path)
+    return render_template('view_training.j2', training_name=path,
+    	training_content=training_content)
 
 
 @app.route('/env', methods=['GET'])
