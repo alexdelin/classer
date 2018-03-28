@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 
 
@@ -10,6 +11,7 @@ class ModelLabEnv(object):
 
 		self.env_config = self.get_env_config(config_file)
 		self.data_dir = self.get_data_dir()
+		self.cache = {}
 
 	
 	def get_env_config(self, config_location='~/.model-lab.json'):
@@ -88,3 +90,22 @@ class ModelLabEnv(object):
 		
 		model_dir = self.data_dir + 'models'
 		return os.listdir(model_dir)
+
+
+	def load_model(self, model_name):
+		
+		# Early Exit
+		if self.cache.get('models', {}).get(model_name):
+			raise ValueError('Model is already loaded!')
+
+		relative_model_path = 'models/{name}/model.py'.format(name=model_name)
+		full_model_path = self.data_dir + relative_model_path
+		full_model_dir = os.path.dirname(full_model_path)
+
+		sys.path.append(full_model_dir)
+		from model import Model
+
+		self.cache.setdefault('models', {})
+		self.cache['models'][model_name] = Model()
+
+		sys.path.remove(full_model_dir)
