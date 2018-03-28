@@ -1,50 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/css/model-lab.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/viewer.js"></script>
+    <title>Model Lab</title>
+</head>
+<body>
+
 <h1>Model lab</h1>
 
-<h3>Add Additional Training</h3>
+<div class="row">
 
-<br />
+    <div class="col-md-6">
 
-<form action="/training/add_single">
-    <input type="text" name="label" placeholder="label" />
-    <input type="text" name="text" placeholder="text" />
-    <select name="training_name">
-      <option value="{{ training_name }}">{{ training_name }}</option>
-    </select>
-    <input type="submit" name="submit" />
-</form>
+        <h3>Add Additional Training</h3>
 
-<br /><br />
+        <br />
 
-<h3>Deduplicate Training</h3>
+        <form id="addForm" action="/training/add_single" target="dummyframe">
+            <input id="addLabel" type="text" name="label" placeholder="label" />
+            <input id="addText" type="text" name="text" placeholder="text" />
+            <select id="addTraining" name="training_name">
+                <option value="{{ training_name }}">{{ training_name }}</option>
+            </select>
+            <div id="addSubmit" class="btn btn-default">Submit</div>
+        </form>
 
-<form action="/training/deduplicate">
-    <select name="training_name">
-      <option value="{{ training_name }}">{{ training_name }}</option>
-    </select>
-    <input type="submit" name="submit" />
-</form>
+        <br /><br />
 
-<br /><br />
+        <h3>Deduplicate Training</h3>
 
-<h3>Training Contents for {{ training_name }}:</h3>
+        <form id="dedupForm" action="/training/deduplicate" target="dummyframe">
+            <select id="dedupTraining" name="training_name">
+              <option value="{{ training_name }}">{{ training_name }}</option>
+            </select>
+            <div id="dedupSubmit" class="btn btn-default">Submit</div>
+        </form>
 
-<table>
-    <tr>
-        <th>
-            Label
-        </th>
-        <th>
-            Text
-        </th>
-    </tr>
-    {% for example in training_content %}
-    	<tr>
-            <td>
-                {{ example.get('label') }}
-            </td>
-            <td>
-                {{ example.get('text') }}
-            </td>
-        </tr>
-    {% endfor %}
-</table>
+        <br /><br />
+
+        <h3>Training Contents for {{ training_name }}:</h3>
+
+        <table>
+            <tr>
+                <th>
+                    Label
+                </th>
+                <th>
+                    Text
+                </th>
+            </tr>
+            {% for example in training_content %}
+            	<tr>
+                    <td>
+                        {{ example.get('label') }}
+                    </td>
+                    <td>
+                        {{ example.get('text') }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="col-md-6">
+        <iframe width="0" height="0" border="0" name="dummyframe" id="dummyframe"></iframe>
+        <div id="status-window">
+            Status Window
+            <div class="status-message">
+                Status Message
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+$("#addSubmit").click(function() {
+
+    console.log( "Handler for add submit called." );
+
+    var addLabel = $('#addLabel')[0].value;
+    var addText = $('#addText')[0].value
+    var addTraining = $('#addTraining')[0].value
+
+    $.ajax({
+        url: '/training/add_single',
+        data: {
+            "label": addLabel,
+            "text": addText,
+            "training_name": addTraining
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement)
+        },
+    });
+});
+
+$("#dedupSubmit").click(function() {
+
+    console.log( "Handler for dedup submit called." );
+
+    var dedupTraining = $('#dedupTraining')[0].value
+
+    $.ajax({
+        url: '/training/deduplicate',
+        data: {
+            "training_name": dedupTraining
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement)
+        },
+    });
+});
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

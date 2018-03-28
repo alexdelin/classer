@@ -23,6 +23,16 @@ def fetch():
     return render_template('index.j2', trainings=training_list)
 
 
+@app.route('/js/<path:path>', methods=['GET', 'POST'])
+def send_js(path):
+    return send_from_directory('js', path)
+
+
+@app.route('/css/<path:path>', methods=['GET', 'POST'])
+def send_css(path):
+    return send_from_directory('css', path)
+
+
 @app.route('/view/training/<path:path>', methods=['GET'])
 def view_training(path):
     """Main Route that displays the documentation"""
