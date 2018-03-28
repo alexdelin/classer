@@ -15,12 +15,13 @@ app = Flask(__name__)
 env = ModelLabEnv()
 
 
-@app.route('/', methods=['GET'])
-def fetch():
+@app.route('/env', methods=['GET'])
+def get_env_details():
     """Main Route that displays the documentation"""
 
-    training_list = env.list_training()
-    return render_template('index.j2', trainings=training_list)
+    env_config = env.get_env_config()
+    print env_config
+    return jsonify(env_config)
 
 
 @app.route('/js/<path:path>', methods=['GET', 'POST'])
@@ -32,25 +33,38 @@ def send_js(path):
 def send_css(path):
     return send_from_directory('css', path)
 
+# ----------UI----------
+@app.route('/', methods=['GET'])
+def fetch():
+    """Main Route that displays the documentation"""
+
+    training_list = env.list_training()
+    model_list = env.list_models()
+    implementation_list = env.list_implementations()
+    corpus_list = env.list_corpora()
+    return render_template('index.j2', trainings=training_list,
+                           models=model_list,
+                           implementations=implementation_list,
+                           corpora=corpus_list)
+
 
 @app.route('/view/training/<path:path>', methods=['GET'])
 def view_training(path):
-    """Main Route that displays the documentation"""
-
-    training_content = env.get_training(path)
-    return render_template('view_training.j2', training_name=path,
+    training_name = path
+    training_content = env.get_training(training_name)
+    return render_template('view_training.j2', training_name=training_name,
                            training_content=training_content)
 
 
-@app.route('/env', methods=['GET'])
-def get_env_details():
-    """Main Route that displays the documentation"""
+@app.route('/view/corpus/<path:path>', methods=['GET'])
+def view_corpus(path):
+    corpus_name = path
+    corpus_content = env.get_corpus(corpus_name)
+    return render_template('view_corpus.j2', corpus_name=corpus_name,
+                           corpus_content=corpus_content)
 
-    env_config = env.get_env_config()
-    print env_config
-    return jsonify(env_config)
 
-
+# ----------Training----------
 @app.route('/training/list', methods=['GET', 'POST'])
 def list_training():
 
@@ -115,11 +129,28 @@ def deduplicate_training():
     return 'Success!'
 
 
+# ----------Models----------
 @app.route('/models/list', methods=['GET', 'POST'])
 def list_models():
 
     model_list = env.list_models()
     return jsonify(model_list)
+
+
+# ----------Implementations----------
+@app.route('/implementations/list', methods=['GET', 'POST'])
+def list_implementations():
+
+    implementation_list = env.list_implementations()
+    return jsonify(implementation_list)
+
+
+# ----------Corpora----------
+@app.route('/corpora/list', methods=['GET', 'POST'])
+def list_corpora():
+
+    corpus_list = env.list_corpora()
+    return jsonify(corpus_list)
 
 
 if __name__ == "__main__":

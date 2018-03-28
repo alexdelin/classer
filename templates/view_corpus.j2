@@ -11,33 +11,29 @@
 
 <h1>Model lab</h1>
 
-Available Trainings:
-<ul>
-{% for training in trainings%}
-	<li><a href="/view/training/{{ training }}">{{ training }}</a></li>
-{% endfor %}
-</ul>
+<div class="row">
 
-Available Models:
-<ul>
-{% for model in models%}
-    <li><a href="/view/model/{{ model }}">{{ model }}</a></li>
-{% endfor %}
-</ul>
+    <div class="col-md-6">
 
-Available Implementations:
-<ul>
-{% for implementation in implementations%}
-    <li><a href="/view/implementation/{{ implementation }}">{{ implementation }}</a></li>
-{% endfor %}
-</ul>
+        <h3>Training Contents for {{ corpus_name }} corpus:</h3>
 
-Available Corpora:
-<ul>
-{% for corpus in corpora%}
-    <li><a href="/view/corpus/{{ corpus }}">{{ corpus }}</a></li>
-{% endfor %}
-</ul>
+        <table>
+            <tr>
+                <th>
+                    Text
+                </th>
+            </tr>
+            {% for example in corpus_content %}
+                <tr>
+                    <td>
+                        {{ example }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</div>
 
 </body>
 </html>

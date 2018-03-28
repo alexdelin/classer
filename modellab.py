@@ -91,6 +91,7 @@ class ModelLabEnv(object):
         unzipped_training = {}
         for example in training_contents:
             unzipped_training[example.get('text')] = example.get('label')
+            #TODO Address conflicting values
 
         new_training = []
         for training_text, training_label in unzipped_training.iteritems():
@@ -150,8 +151,8 @@ class ModelLabEnv(object):
     # ----------Implementations----------
     def list_implementations(self):
 
-        model_dir = self.data_dir + 'models'
-        return os.listdir(model_dir)
+        implementation_dir = self.data_dir + 'implementations'
+        return os.listdir(implementation_dir)
 
     def create_implementation(self, model_name, training_name,
                               implementation_name):
@@ -189,7 +190,16 @@ class ModelLabEnv(object):
 
     # ----------Corpora----------
     def list_corpora(self):
-        pass
+        corpora_dir = self.data_dir + 'corpora'
+        return os.listdir(corpora_dir)
 
     def get_corpus(self, corpus_name):
-        return None
+
+        relative_corpus_path = 'corpora/{name}/corpus.json'.format(
+                                    name=corpus_name)
+        full_corpus_path = self.data_dir + relative_corpus_path
+
+        with open(full_corpus_path, 'r') as corpus_file:
+            corpus_data = json.load(corpus_file)
+
+        return corpus_data
