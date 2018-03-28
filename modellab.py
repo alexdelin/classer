@@ -28,6 +28,20 @@ class ModelLabEnv(object):
 		return self.env_config.get('data-dir')
 
 
+	def create_training(self, training_name, training_data=[]):
+		
+		relative_training_path = 'training/{name}/{name}_training.json'.format(name=training_name)
+		full_training_path = self.get_data_dir() + relative_training_path
+
+		if os.path.exists(full_training_path):
+			raise ValueError('Training to create already exists')
+
+		os.makedirs(os.path.dirname(full_training_path))
+
+		with open(full_training_path, 'r') as training_file:
+			json.dump(training_data, training_file)
+
+
 	def get_training(self, training_name):
 		
 		relative_training_path = 'training/{name}/{name}_training.json'.format(name=training_name)
@@ -37,3 +51,27 @@ class ModelLabEnv(object):
 			training_data = json.load(training_file)
 
 		return training_data
+
+
+	def write_training(self, training_name, training_data):
+		
+		relative_training_path = 'training/{name}/{name}_training.json'.format(name=training_name)
+		full_training_path = self.get_data_dir() + relative_training_path
+
+		with open(full_training_path, 'w') as training_file:
+			json.dump(training_data, training_file)
+
+
+	def add_to_training(self, training_name, new_examples):
+		
+		training = self.get_training(training_name)
+
+		for new_example in new_examples:
+			training.append(new_example)
+
+		self.write_training(training_name, training)
+
+
+	def deduplicate_training(self, training_name):
+		
+		raise NotImplementedError
