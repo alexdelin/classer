@@ -27,7 +27,7 @@ class ModelLabEnv(object):
 
 		return self.env_config.get('data-dir')
 
-
+	# ----------Training----------
 	def list_training(self):
 
 		training_dir = self.data_dir + 'training'
@@ -83,4 +83,8 @@ class ModelLabEnv(object):
 		raise NotImplementedError
 
 
-	
+	# ----------Models----------
+	def list_models(self):
+		
+		model_dir = self.data_dir + 'models'
+		return os.listdir(model_dir)

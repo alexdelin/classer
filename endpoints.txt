@@ -12,3 +12,5 @@ http://localhost:8181/training/create?training_name=test&training_data=[{"text":
 http://localhost:8181/training/get?training_name=test
 http://localhost:8181/training/add?training_name=test&training_data=[{"text": "some more good stuff", "label": "pos"}]
 
+# Models
+http://localhost:8181/models/list

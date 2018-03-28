@@ -88,5 +88,12 @@ def add_to_training():
 	return 'Success!'
 
 
+@app.route('/models/list', methods=['GET', 'POST'])
+def list_models():
+	
+	model_list = env.list_models()
+	return jsonify(model_list)
+
+
 if __name__ == "__main__":
     app.run(port=8181, debug=True)
