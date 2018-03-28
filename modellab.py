@@ -154,6 +154,17 @@ class ModelLabEnv(object):
         implementation_dir = self.data_dir + 'implementations'
         return os.listdir(implementation_dir)
 
+    def get_implementation(self, implementation_name):
+
+        relative_implementation_path = 'implementations/{name}/implementation.json'.format(
+                                    name=implementation_name)
+        full_implementation_path = self.data_dir + relative_implementation_path
+
+        with open(full_implementation_path, 'r') as implementation_file:
+            implementation_data = json.load(implementation_file)
+
+        return implementation_data
+
     def create_implementation(self, model_name, training_name,
                               implementation_name):
 

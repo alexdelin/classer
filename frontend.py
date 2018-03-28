@@ -56,6 +56,15 @@ def view_training(path):
                            training_content=training_content)
 
 
+@app.route('/view/implementation/<path:path>', methods=['GET'])
+def view_implementation(path):
+    implementation_name = path
+    implementation_config = env.get_implementation(implementation_name)
+    return render_template('view_implementation.j2',
+                           implementation_name=implementation_name,
+                           implementation_config=implementation_config)
+
+
 @app.route('/view/corpus/<path:path>', methods=['GET'])
 def view_corpus(path):
     corpus_name = path

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/css/model-lab.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/viewer.js"></script>
+    <title>Model Lab</title>
+</head>
+<body>
+
+<h1>Model lab</h1>
+
+<div class="row">
+
+    <div class="col-md-6">
+
+        <h3>Implementation Contents for {{ implementation_name }} implementation:</h3>
+
+        <table>
+            <tr>
+                <td>
+                    Model: {{ implementation_config.get('model_name') }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Training: {{ implementation_config.get('training_name') }}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>
