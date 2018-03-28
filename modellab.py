@@ -86,7 +86,20 @@ class ModelLabEnv(object):
 
     def deduplicate_training(self, training_name):
 
-        raise NotImplementedError
+        training_contents = self.get_training(training_name)
+
+        unzipped_training = {}
+        for example in training_contents:
+            unzipped_training[example.get('text')] = example.get('label')
+
+        new_training = []
+        for training_text, training_label in unzipped_training.iteritems():
+            new_training.append({
+                    "text": training_text,
+                    "label": training_label
+                })
+
+        self.write_training(training_name, new_training)
 
     # ----------Models----------
     def list_models(self):

@@ -61,7 +61,6 @@ def create_training():
 def get_training():
 
     training_name = request.args.get('training_name')
-
     training_content = env.get_training(training_name)
 
     return jsonify(training_content)
@@ -94,6 +93,15 @@ def add_single_to_training():
     }]
 
     env.add_to_training(training_name, new_examples)
+    return 'Success!'
+
+
+@app.route('/training/deduplicate', methods=['GET', 'POST'])
+def deduplicate_training():
+
+    training_name = request.args.get('training_name')
+    env.deduplicate_training(training_name)
+
     return 'Success!'
 
 
