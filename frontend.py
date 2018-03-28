@@ -21,6 +21,7 @@ from modellab import ModelLabEnv
 app = Flask(__name__)
 env = ModelLabEnv()
 
+
 @app.route('/', methods=['GET'])
 def fetch():
     """Main Route that displays the documentation"""
@@ -51,15 +52,22 @@ def get_env_details():
 def list_training():
 	
 	training_list = env.list_training()
-
 	return jsonify(training_list)
+
+
+@app.route('/training/create', methods=['GET', 'POST'])
+def create_training():
+	
+	training_name = request.args.get('training_name')
+	training_content = request.args.get('training_data')
+	env.create_training(training_name, training_content)
+	return 'Success!'
 
 
 @app.route('/training/get', methods=['GET', 'POST'])
 def get_training():
 	
 	training_name = request.args.get('training_name')
-	print 'Getting training: {}'.format(training_name)
 
 	training_content = env.get_training(training_name)
 
@@ -70,8 +78,6 @@ def get_training():
 def add_to_training():
 	
 	training_name = request.args.get('training_name')
-	print 'Adding to training: {}'.format(training_name)
-
 	new_examples = request.args.get('training_data')
 	try:
 		new_examples = json.loads(new_examples)
@@ -79,7 +85,6 @@ def add_to_training():
 		return 'The training data provided is not in a valid JSON format'
 
 	env.add_to_training(training_name, new_examples)
-
 	return 'Success!'
 
 
