@@ -28,10 +28,16 @@ class ModelLabEnv(object):
 		return self.env_config.get('data-dir')
 
 
+	def list_training(self):
+
+		training_dir = self.data_dir + 'training'
+		return os.listdir(training_dir)
+
+
 	def create_training(self, training_name, training_data=[]):
 		
 		relative_training_path = 'training/{name}/{name}_training.json'.format(name=training_name)
-		full_training_path = self.get_data_dir() + relative_training_path
+		full_training_path = self.data_dir + relative_training_path
 
 		if os.path.exists(full_training_path):
 			raise ValueError('Training to create already exists')
@@ -45,7 +51,7 @@ class ModelLabEnv(object):
 	def get_training(self, training_name):
 		
 		relative_training_path = 'training/{name}/{name}_training.json'.format(name=training_name)
-		full_training_path = self.get_data_dir() + relative_training_path
+		full_training_path = self.data_dir + relative_training_path
 
 		with open(full_training_path, 'r') as training_file:
 			training_data = json.load(training_file)
@@ -56,7 +62,7 @@ class ModelLabEnv(object):
 	def write_training(self, training_name, training_data):
 		
 		relative_training_path = 'training/{name}/{name}_training.json'.format(name=training_name)
-		full_training_path = self.get_data_dir() + relative_training_path
+		full_training_path = self.data_dir + relative_training_path
 
 		with open(full_training_path, 'w') as training_file:
 			json.dump(training_data, training_file)

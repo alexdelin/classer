@@ -37,6 +37,14 @@ def get_env_details():
     return jsonify(env_config)
 
 
+@app.route('/training/list', methods=['GET', 'POST'])
+def list_training():
+	
+	training_list = env.list_training()
+
+	return jsonify(training_list)
+
+
 @app.route('/training/get', methods=['GET', 'POST'])
 def get_training():
 	
@@ -63,6 +71,7 @@ def add_to_training():
 	env.add_to_training(training_name, new_examples)
 
 	return 'Success!'
+
 
 if __name__ == "__main__":
     app.run(port=8181, debug=True)
