@@ -1,0 +1,14 @@
+# UI
+http://localhost:8181
+http://localhost:8181/view/training/test
+
+# Env
+http://localhost:8181/env
+
+# Training
+http://localhost:8181/training/list
+http://localhost:8181/training/create?training_name=test
+http://localhost:8181/training/create?training_name=test&training_data=[{"text": "some more good stuff", "label": "pos"}]
+http://localhost:8181/training/get?training_name=test
+http://localhost:8181/training/add?training_name=test&training_data=[{"text": "some more good stuff", "label": "pos"}]
+
