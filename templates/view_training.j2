@@ -1,8 +1,39 @@
 <h1>Model lab</h1>
 
-Training Contents for {{ training_name }}:
-<ul>
-{% for example in training_content %}
-	<li><strong>{{ example.get('label') }}</strong> - {{ example.get('text') }}</li>
-{% endfor %}
-</ul>
+<h3>Add Additional Training</h3>
+
+<br />
+
+<form action="/training/add_single">
+    <input type="text" name="label" placeholder="label" />
+    <input type="text" name="text" placeholder="text" />
+    <select name="training_name">
+      <option value="{{ training_name }}">{{ training_name }}</option>
+    </select>
+    <input type="submit" name="submit" />
+</form>
+
+<br /><br />
+
+<h3>Training Contents for {{ training_name }}:</h3>
+
+<table>
+    <tr>
+        <th>
+            Label
+        </th>
+        <th>
+            Text
+        </th>
+    </tr>
+    {% for example in training_content %}
+    	<tr>
+            <td>
+                {{ example.get('label') }}
+            </td>
+            <td>
+                {{ example.get('text') }}
+            </td>
+        </tr>
+    {% endfor %}
+</table>

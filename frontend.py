@@ -4,19 +4,12 @@
 This is a template for a flask app
 '''
 
-import time
-import os
-import site
-import sys
-import urllib
-import requests
-import logging
 import json
-from logging.handlers import RotatingFileHandler
 
-from flask import Flask, request, Response, render_template, jsonify, send_from_directory
+from flask import Flask, request, render_template, jsonify, send_from_directory
 
 from modellab import ModelLabEnv
+
 
 app = Flask(__name__)
 env = ModelLabEnv()
@@ -36,7 +29,7 @@ def view_training(path):
 
     training_content = env.get_training(path)
     return render_template('view_training.j2', training_name=path,
-    	training_content=training_content)
+                           training_content=training_content)
 
 
 @app.route('/env', methods=['GET'])
@@ -50,49 +43,65 @@ def get_env_details():
 
 @app.route('/training/list', methods=['GET', 'POST'])
 def list_training():
-	
-	training_list = env.list_training()
-	return jsonify(training_list)
+
+    training_list = env.list_training()
+    return jsonify(training_list)
 
 
 @app.route('/training/create', methods=['GET', 'POST'])
 def create_training():
-	
-	training_name = request.args.get('training_name')
-	training_content = request.args.get('training_data')
-	env.create_training(training_name, training_content)
-	return 'Success!'
+
+    training_name = request.args.get('training_name')
+    training_content = request.args.get('training_data')
+    env.create_training(training_name, training_content)
+    return 'Success!'
 
 
 @app.route('/training/get', methods=['GET', 'POST'])
 def get_training():
-	
-	training_name = request.args.get('training_name')
 
-	training_content = env.get_training(training_name)
+    training_name = request.args.get('training_name')
 
-	return jsonify(training_content)
+    training_content = env.get_training(training_name)
+
+    return jsonify(training_content)
 
 
 @app.route('/training/add', methods=['GET', 'POST'])
 def add_to_training():
-	
-	training_name = request.args.get('training_name')
-	new_examples = request.args.get('training_data')
-	try:
-		new_examples = json.loads(new_examples)
-	except:
-		return 'The training data provided is not in a valid JSON format'
 
-	env.add_to_training(training_name, new_examples)
-	return 'Success!'
+    training_name = request.args.get('training_name')
+    new_examples = request.args.get('training_data')
+    try:
+        new_examples = json.loads(new_examples)
+    except:
+        return 'The training data provided is not in a valid JSON format'
+
+    env.add_to_training(training_name, new_examples)
+    return 'Success!'
+
+
+@app.route('/training/add_single', methods=['GET', 'POST'])
+def add_single_to_training():
+
+    training_name = request.args.get('training_name')
+    text = request.args.get('text')
+    label = request.args.get('label')
+
+    new_examples = [{
+        "text": text,
+        "label": label
+    }]
+
+    env.add_to_training(training_name, new_examples)
+    return 'Success!'
 
 
 @app.route('/models/list', methods=['GET', 'POST'])
 def list_models():
-	
-	model_list = env.list_models()
-	return jsonify(model_list)
+
+    model_list = env.list_models()
+    return jsonify(model_list)
 
 
 if __name__ == "__main__":
