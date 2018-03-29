@@ -21,6 +21,7 @@ $("#addSubmit").click(function() {
     });
 });
 
+
 $("#dedupSubmit").click(function() {
 
     console.log( "Handler for dedup submit called." );
@@ -40,6 +41,34 @@ $("#dedupSubmit").click(function() {
     });
 });
 
+
+$("#refreshSubmit").click(function() {
+
+    console.log( "Handler for refresh submit called." );
+
+    $('.training-example').remove()
+    var trainingName = $('#addTraining')[0].value
+
+    $.ajax({
+        url: '/training/get',
+        data: {
+            "training_name": trainingName
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement)
+
+            var loadedResponse = JSON.parse(response)
+            _.each(loadedResponse, function(trainingExample) {
+                var exampleElement = '<tr class="training-example"><td>' + trainingExample['label'] + '</td><td>' + trainingExample['text'] + '</td></tr>'
+                $('#training-example-list').append(exampleElement)
+            });
+        },
+    });
+});
+
+
 $("#extendSubmit").click(function() {
 
     console.log( "Handler for extend submit called." );
@@ -48,6 +77,7 @@ $("#extendSubmit").click(function() {
 
     var extendCorpus = $('#extendCorpus')[0].value
     var extendImplementation = $('#extendImplementation')[0].value
+    var trainingName = $('#addTraining')[0].value
 
     $.ajax({
         url: '/training/recommend',
@@ -78,7 +108,7 @@ $("#extendSubmit").click(function() {
                     data: {
                         "label": newLabel,
                         "text": newText,
-                        "training_name": '{{training_name}}'
+                        "training_name": trainingName
                     },
                     success: function(response) {
                         console.log(response)

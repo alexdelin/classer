@@ -105,7 +105,7 @@ def get_training():
     training_name = request.args.get('training_name')
     training_content = env.get_training(training_name)
 
-    return jsonify(training_content)
+    return json.dumps(training_content)
 
 
 @app.route('/training/add', methods=['GET', 'POST'])
