@@ -1,10 +1,92 @@
-$("#addForm").bind('ajax:complete', function() {
-         console.log('Done!')
+$("#addSubmit").click(function() {
+
+    console.log( "Handler for add submit called." );
+
+    var addLabel = $('#addLabel')[0].value;
+    var addText = $('#addText')[0].value
+    var addTraining = $('#addTraining')[0].value
+
+    $.ajax({
+        url: '/training/add_single',
+        data: {
+            "label": addLabel,
+            "text": addText,
+            "training_name": addTraining
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement)
+        },
+    });
 });
 
-console.log('Loaded')
+$("#dedupSubmit").click(function() {
 
+    console.log( "Handler for dedup submit called." );
 
-$("#addSubmit").click(function() {
-  console.log( "Handler for .click() called." );
+    var dedupTraining = $('#dedupTraining')[0].value
+
+    $.ajax({
+        url: '/training/deduplicate',
+        data: {
+            "training_name": dedupTraining
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement)
+        },
+    });
+});
+
+$("#extendSubmit").click(function() {
+
+    console.log( "Handler for extend submit called." );
+    // Remove all previous recommendations
+    $('.recommendation-row').remove()
+
+    var extendCorpus = $('#extendCorpus')[0].value
+    var extendImplementation = $('#extendImplementation')[0].value
+
+    $.ajax({
+        url: '/training/recommend',
+        data: {
+            "implementation_name": extendImplementation,
+            "corpus_name": extendCorpus
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement)
+
+            // Add recommendation to table
+            loadedResponse = JSON.parse(response)
+            _.each(loadedResponse, function(recElement) {
+                var rowElement = '<tr class="recommendation-row"><td class="recText">' + recElement['text'] + '</td><td class="recLabel">' + recElement['label'] + '</td><td><div class="btn btn-default addExample">Add</div></td></tr>'
+                $('#training-recommendations').append(rowElement)
+            });
+
+            $(".addExample").on('click', function(ev) {
+                console.log( "Handler for add example called." );
+                debugger;
+                var newText = $(ev.target.parentElement.parentElement).find('.recText')[0].innerHTML
+                var newLabel = $(ev.target.parentElement.parentElement).find('.recLabel')[0].innerHTML
+
+                $.ajax({
+                    url: '/training/add_single',
+                    data: {
+                        "label": newLabel,
+                        "text": newText,
+                        "training_name": '{{training_name}}'
+                    },
+                    success: function(response) {
+                        console.log(response)
+                        var newElement = '<div class="status-message">' + response + '</div>';
+                        $('#status-window').append(newElement)
+                    }
+                });
+            });
+        },
+    });
 });

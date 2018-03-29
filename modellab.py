@@ -43,8 +43,8 @@ class ModelLabEnv(object):
 
     def create_training(self, training_name, training_data=None):
 
-    	if not training_data:
-    		training_data = []
+        if not training_data:
+            training_data = []
 
         relative_training_path = 'training/{name}/{name}_training.json'.format(
                                     name=training_name)
@@ -54,7 +54,7 @@ class ModelLabEnv(object):
             raise ValueError('Training to create already exists')
 
         if not os.path.exists(os.path.dirname(full_training_path)):
-	        os.makedirs(os.path.dirname(full_training_path))
+            os.makedirs(os.path.dirname(full_training_path))
 
         with open(full_training_path, 'w') as training_file:
             json.dump(training_data, training_file)
@@ -106,7 +106,33 @@ class ModelLabEnv(object):
 
         self.write_training(training_name, new_training)
 
-    # ----------Models----------
+    def recommend_training(self, corpus_name, implementation_name, amount='10'):
+
+        try:
+            amount = int(amount)
+        except:
+            raise ValueError('invalid amount specified')
+
+        corpus = self.get_corpus(corpus_name)
+        if len(corpus) > amount:
+            corpus = corpus[:amount]
+
+        loaded_implementations = self.list_loaded_implementations()
+        if implementation_name not in loaded_implementations:
+            self.load_implementation(implementation_name)
+
+        recommendation = []
+        for test_document in corpus:
+            expected_label = self.evaluate_implementation(implementation_name,
+                                                          test_document)
+            recommendation.append({
+                "text": test_document,
+                "label": expected_label
+            })
+
+        return recommendation
+
+# ----------Models----------
     def list_models(self):
 
         model_dir = self.data_dir + 'models'
@@ -157,7 +183,7 @@ class ModelLabEnv(object):
         label = self.cache['models'][model_name].evaluate(text)
         return label
 
-    # ----------Implementations----------
+# ----------Implementations----------
     def list_implementations(self):
 
         implementation_dir = self.data_dir + 'implementations'
@@ -170,8 +196,9 @@ class ModelLabEnv(object):
 
     def get_implementation(self, implementation_name):
 
-        relative_implementation_path = 'implementations/{name}/implementation.json'.format(
-                                    name=implementation_name)
+        relative_implementation_path = 'implementations/{name}/'\
+                                       'implementation.json'.format(
+                                            name=implementation_name)
         full_implementation_path = self.data_dir + relative_implementation_path
 
         with open(full_implementation_path, 'r') as implementation_file:
@@ -205,17 +232,17 @@ class ModelLabEnv(object):
 
         # Write Implementation Config
         relative_implementation_config_path = 'implementations/{name}/'\
-                                       'implementation.json'.format(
-                                            name=implementation_name)
+                                              'implementation.json'.format(
+                                                    name=implementation_name)
         implementation_config_path = self.data_dir + relative_implementation_config_path
-        
+
         implementation_config = {
-        	"model_name": model_name,
-        	"training_name": training_name
+            "model_name": model_name,
+            "training_name": training_name
         }
 
         with open(implementation_config_path, 'w') as implementation_config_file:
-        	json.dump(implementation_config, implementation_config_file)
+            json.dump(implementation_config, implementation_config_file)
 
     def load_implementation(self, implementation_name):
 
@@ -261,7 +288,7 @@ class ModelLabEnv(object):
             raise ValueError('Implementation to create already exists')
 
         if not os.path.exists(os.path.dirname(full_implementation_path)):
-	        os.makedirs(os.path.dirname(full_implementation_path))
+            os.makedirs(os.path.dirname(full_implementation_path))
 
         with open(full_implementation_path, 'w') as implementation_file:
             pickle.dump(implementation_object, implementation_file)
@@ -281,7 +308,7 @@ class ModelLabEnv(object):
         label = self.cache['implementations'][implementation_name].evaluate(text)
         return label
 
-    # ----------Corpora----------
+# ----------Corpora----------
     def list_corpora(self):
         corpora_dir = self.data_dir + 'corpora'
         return os.listdir(corpora_dir)

@@ -33,6 +33,12 @@ def send_js(path):
 def send_css(path):
     return send_from_directory('css', path)
 
+
+@app.route('/img/<path:path>', methods=['GET', 'POST'])
+def send_img(path):
+    return send_from_directory('img', path)
+
+
 # ----------UI----------
 @app.route('/', methods=['GET'])
 def fetch():
@@ -52,8 +58,11 @@ def fetch():
 def view_training(path):
     training_name = path
     training_content = env.get_training(training_name)
+    corpora = env.list_corpora()
+    implementations = env.list_implementations()
     return render_template('view_training.j2', training_name=training_name,
-                           training_content=training_content)
+                           training_content=training_content,
+                           corpora=corpora, implementations=implementations)
 
 
 @app.route('/view/implementation/<path:path>', methods=['GET'])
@@ -136,6 +145,18 @@ def deduplicate_training():
     env.deduplicate_training(training_name)
 
     return 'Success!'
+
+
+@app.route('/training/recommend', methods=['GET', 'POST'])
+def recommend_training():
+
+    corpus_name = request.args.get('corpus_name')
+    implementation_name = request.args.get('implementation_name')
+    amount = request.args.get('amount', '10')
+
+    recommended_training = env.recommend_training(corpus_name,
+                                                  implementation_name, amount)
+    return json.dumps(recommended_training)
 
 
 # ----------Models----------
