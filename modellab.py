@@ -94,15 +94,26 @@ class ModelLabEnv(object):
 
         unzipped_training = {}
         for example in training_contents:
-            unzipped_training[example.get('text')] = example.get('label')
-            #TODO Address conflicting values
+
+            if not example.get('text') or not example.get('label'):
+                print 'Skipping example with missing text or label'
+                continue
+
+            if unzipped_training.get(example.get('text')):
+                if unzipped_training.get(example.get('text')) == example.get('label'):
+                    continue
+                else:
+                    del unzipped_training[example.get('text')]
+            else:
+                unzipped_training[example.get('text')] = example.get('label')
 
         new_training = []
         for training_text, training_label in unzipped_training.iteritems():
             new_training.append({
-                    "text": training_text,
-                    "label": training_label
-                })
+                "text": training_text,
+                "label": training_label
+            })
+
 
         self.write_training(training_name, new_training)
 
