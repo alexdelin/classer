@@ -154,6 +154,31 @@ def list_implementations():
     return jsonify(implementation_list)
 
 
+@app.route('/implementations/load', methods=['GET', 'POST'])
+def load_implementation():
+
+    implementation_name = request.args.get('implementation_name')
+    env.load_implementation(implementation_name)
+    return 'Success!'
+
+
+@app.route('/implementations/listloaded', methods=['GET', 'POST'])
+def list_loaded_implementations():
+
+    loaded_implementation_list = env.list_loaded_implementations()
+    return json.dumps(loaded_implementation_list)
+
+
+@app.route('/implementations/create', methods=['GET', 'POST'])
+def create_implementation():
+
+    model_name = request.args.get('model_name')
+    training_name = request.args.get('training_name')
+    implementation_name = request.args.get('implementation_name')
+    env.create_implementation(model_name, training_name, implementation_name)
+    return 'Success!'
+
+
 # ----------Corpora----------
 @app.route('/corpora/list', methods=['GET', 'POST'])
 def list_corpora():

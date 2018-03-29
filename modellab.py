@@ -118,13 +118,18 @@ class ModelLabEnv(object):
         full_model_path = self.data_dir + relative_model_path
         full_model_dir = os.path.dirname(full_model_path)
 
-        sys.path.append(full_model_dir)
-        from model import Model
+        loaded_model = self.load_model_class(full_model_dir)
 
         self.cache.setdefault('models', {})
-        self.cache['models'][model_name] = Model()
+        self.cache['models'][model_name] = loaded_model
 
+    def load_model_class(self, full_model_dir):
+
+        sys.path.append(full_model_dir)
+        from model import Model
+        loaded_model = Model()
         sys.path.remove(full_model_dir)
+        return loaded_model
 
     def unload_model(self, model_name):
 
@@ -154,6 +159,11 @@ class ModelLabEnv(object):
         implementation_dir = self.data_dir + 'implementations'
         return os.listdir(implementation_dir)
 
+    def list_loaded_implementations(self):
+        loaded_implementations = self.cache['implementations'].keys()
+        print loaded_implementations
+        return loaded_implementations
+
     def get_implementation(self, implementation_name):
 
         relative_implementation_path = 'implementations/{name}/implementation.json'.format(
@@ -168,7 +178,26 @@ class ModelLabEnv(object):
     def create_implementation(self, model_name, training_name,
                               implementation_name):
 
-        pass
+        # Early Exit
+        if self.cache.get('implementations', {}).get(implementation_name):
+            raise ValueError('Implementation already exists!')
+
+        # Load Selected Model
+        relative_model_path = 'models/{name}/model.py'.format(name=model_name)
+        full_model_path = self.data_dir + relative_model_path
+        full_model_dir = os.path.dirname(full_model_path)
+
+        loaded_model = self.load_model_class(full_model_dir)
+
+        self.cache.setdefault('implementations', {})
+        self.cache['implementations'][implementation_name] = loaded_model
+
+        # Train with Selected Data
+        training_content = self.get_training(training_name)
+        self.cache['implementations'][implementation_name].train(training_content)
+
+        # Save Trained Implementation
+        self.save_implementation(implementation_name)
 
     def load_implementation(self, implementation_name):
 
@@ -181,13 +210,36 @@ class ModelLabEnv(object):
                                             name=implementation_name)
         full_implementation_path = self.data_dir + relative_implementation_path
 
+        # Add model dir to path before loading
+        implementation_config_path = os.path.join(
+            os.path.dirname(full_implementation_path),
+            'implementation.json')
+        with open(implementation_config_path, 'r') as implementation_config_file:
+            implementation_config = json.load(implementation_config_file)
+
+        model_name = implementation_config.get('model_name')
+        relative_model_path = 'models/{name}/model.py'.format(name=model_name)
+        full_model_path = self.data_dir + relative_model_path
+        full_model_dir = os.path.dirname(full_model_path)
+        sys.path.append(full_model_dir)
+
         with open(full_implementation_path, 'r') as implementation_file:
             loaded_implementation = pickle.load(implementation_file)
+
+        sys.path.remove(full_model_dir)
 
         self.cache['implementations'][implementation_name] = loaded_implementation
 
     def save_implementation(self, implementation_name):
-        pass
+
+        relative_implementation_path = 'implementations/{name}/'\
+                                       'implementation.pickle'.format(
+                                            name=implementation_name)
+        full_implementation_path = self.data_dir + relative_implementation_path
+
+        implementation_object = self.cache['implementations'][implementation_name]
+        with open(full_implementation_path, 'w') as implementation_file:
+            pickle.dump(implementation_object, implementation_file)
 
     def unload_implementation(self, implementation_name):
 
