@@ -41,7 +41,10 @@ class ModelLabEnv(object):
         training_dir = self.data_dir + 'training'
         return os.listdir(training_dir)
 
-    def create_training(self, training_name, training_data=[]):
+    def create_training(self, training_name, training_data=None):
+
+    	if not training_data:
+    		training_data = []
 
         relative_training_path = 'training/{name}/{name}_training.json'.format(
                                     name=training_name)
@@ -50,9 +53,10 @@ class ModelLabEnv(object):
         if os.path.exists(full_training_path):
             raise ValueError('Training to create already exists')
 
-        os.makedirs(os.path.dirname(full_training_path))
+        if not os.path.exists(os.path.dirname(full_training_path)):
+	        os.makedirs(os.path.dirname(full_training_path))
 
-        with open(full_training_path, 'r') as training_file:
+        with open(full_training_path, 'w') as training_file:
             json.dump(training_data, training_file)
 
     def get_training(self, training_name):
@@ -199,6 +203,20 @@ class ModelLabEnv(object):
         # Save Trained Implementation
         self.save_implementation(implementation_name)
 
+        # Write Implementation Config
+        relative_implementation_config_path = 'implementations/{name}/'\
+                                       'implementation.json'.format(
+                                            name=implementation_name)
+        implementation_config_path = self.data_dir + relative_implementation_config_path
+        
+        implementation_config = {
+        	"model_name": model_name,
+        	"training_name": training_name
+        }
+
+        with open(implementation_config_path, 'w') as implementation_config_file:
+        	json.dump(implementation_config, implementation_config_file)
+
     def load_implementation(self, implementation_name):
 
         # Early Exit
@@ -238,6 +256,13 @@ class ModelLabEnv(object):
         full_implementation_path = self.data_dir + relative_implementation_path
 
         implementation_object = self.cache['implementations'][implementation_name]
+
+        if os.path.exists(full_implementation_path):
+            raise ValueError('Implementation to create already exists')
+
+        if not os.path.exists(os.path.dirname(full_implementation_path)):
+	        os.makedirs(os.path.dirname(full_implementation_path))
+
         with open(full_implementation_path, 'w') as implementation_file:
             pickle.dump(implementation_object, implementation_file)
 

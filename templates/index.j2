@@ -11,33 +11,124 @@
 
 <h1>Model lab</h1>
 
-Available Trainings:
-<ul>
-{% for training in trainings%}
-	<li><a href="/view/training/{{ training }}">{{ training }}</a></li>
-{% endfor %}
-</ul>
+<div class="row">
 
-Available Models:
-<ul>
-{% for model in models%}
-    <li><a href="/view/model/{{ model }}">{{ model }}</a></li>
-{% endfor %}
-</ul>
+    <div class="col-md-6">
 
-Available Implementations:
-<ul>
-{% for implementation in implementations%}
-    <li><a href="/view/implementation/{{ implementation }}">{{ implementation }}</a></li>
-{% endfor %}
-</ul>
+		<h2>Available Trainings:</h2>
+		<ul>
+		{% for training in trainings%}
+			<li><a href="/view/training/{{ training }}">{{ training }}</a></li>
+		{% endfor %}
+		</ul>
 
-Available Corpora:
-<ul>
-{% for corpus in corpora%}
-    <li><a href="/view/corpus/{{ corpus }}">{{ corpus }}</a></li>
-{% endfor %}
-</ul>
+		<h3>Create Training</h3>
+		<input id="trainingName" type="text" name="evalText">
+		<div id="createTraining" class="btn btn-default">Create Training</div>
+
+		<h2>Available Models:</h2>
+		<ul>
+		{% for model in models%}
+		    <li><a href="/view/model/{{ model }}">{{ model }}</a></li>
+		{% endfor %}
+		</ul>
+
+		<h2>Available Implementations:</h2>
+		<ul>
+		{% for implementation in implementations%}
+		    <li><a href="/view/implementation/{{ implementation }}">{{ implementation }}</a></li>
+		{% endfor %}
+		</ul>
+
+		<h2>Available Corpora:</h2>
+		<ul>
+		{% for corpus in corpora%}
+		    <li><a href="/view/corpus/{{ corpus }}">{{ corpus }}</a></li>
+		{% endfor %}
+		</ul>
+
+		<h3>Create Implementation</h3>
+		Training:<select id="impTrainingName">
+			{% for training in trainings%}
+				<option>{{ training }}</option>
+			{% endfor %}
+		</select>
+		Model:<select id="impModelName">
+			{% for model in models %}
+				<option>{{ model }}</option>
+			{% endfor %}
+		</select>
+		Name: <input type="text" id="impName">
+		<div id="createImplementation" class="btn btn-default">Create Implementation</div>
+
+	</div>
+
+	<div class="col-md-6">
+        <iframe width="0" height="0" border="0" name="dummyframe" id="dummyframe"></iframe>
+        <div id="status-window">
+            Status Window
+            <div class="status-message">
+                Status Message
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+$("#createTraining").click(function() {
+
+    console.log( "Handler for Create Training called." );
+
+    var trainingName = $('#trainingName')[0].value
+    if (trainingName.length === 0) {
+    	console.log('early exit')
+    	return
+    }
+
+    $.ajax({
+        url: '/training/create',
+        data: {
+        	training_name: trainingName
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement);
+        },
+    });
+});
+
+$("#createImplementation").click(function() {
+
+    console.log( "Handler for Create Implementation called." );
+
+    var impName = $('#impName')[0].value
+    if (impName.length === 0) {
+    	console.log('early exit')
+    	return
+    }
+
+    var trainingName = $('#impTrainingName')[0].value
+    var modelName = $('#impModelName')[0].value
+
+    $.ajax({
+        url: '/implementations/create',
+        data: {
+        	implementation_name: impName,
+        	training_name: trainingName,
+        	model_name: modelName
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement);
+        },
+    });
+});
+
+</script>
 
 </body>
 </html>
