@@ -249,7 +249,12 @@ class ModelLabEnv(object):
             raise ValueError('Selected implementation is currently not loaded')
 
     def evaluate_implementation(self, implementation_name, text):
-        pass
+
+        if not self.cache['implementations'].get(implementation_name):
+            raise ValueError('Selected Implementation is currently not loaded')
+
+        label = self.cache['implementations'][implementation_name].evaluate(text)
+        return label
 
     # ----------Corpora----------
     def list_corpora(self):

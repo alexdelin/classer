@@ -29,9 +29,94 @@
                 </td>
             </tr>
         </table>
+
+        <h3>Implementation Status</h3>
+        <div id="checkStatus" class="btn btn-default">Check Status</div>
+        <div id="loadImplementation" class="btn btn-default">Load Implementation</div>
+        <div id="implementationStatus">Unknown</div>
+
+        <br />
+        <br />
+
+        <h3>Evaluate Implementation</h3>
+        <input id="evaluateText" type="text" name="evalText">
+        <div id="evaluate" class="btn btn-default">Check Status</div>
+
+    </div>
+    
+    <div class="col-md-6">
+        <iframe width="0" height="0" border="0" name="dummyframe" id="dummyframe"></iframe>
+        <div id="status-window">
+            Status Window
+            <div class="status-message">
+                Status Message
+            </div>
+        </div>
     </div>
 
 </div>
+
+<script type="text/javascript">
+
+$("#checkStatus").click(function() {
+
+    console.log( "Handler for Check Status called." );
+
+    $.ajax({
+        url: '/implementations/list_loaded',
+        data: {},
+        success: function(response) {
+            var parsed_response = JSON.parse(response);
+            console.log(parsed_response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement);
+
+            if (parsed_response.indexOf('{{implementation_name}}') >= 0) {
+                var currentStatus = 'Loaded'
+            } else {
+                var currentStatus = 'Not Loaded'
+            }
+            $('#implementationStatus')[0].innerHTML = currentStatus
+        },
+    });
+});
+
+$("#loadImplementation").click(function() {
+
+    console.log( "Handler for Load Implementation called." );
+
+    $.ajax({
+        url: '/implementations/load',
+        data: {
+            implementation_name: '{{implementation_name}}'
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement);
+        },
+    });
+});
+
+$("#evaluate").click(function() {
+
+    console.log( "Handler for Evaluate called." );
+    var evalText = $('#evaluateText')[0].value; 
+    $.ajax({
+        url: '/implementations/evaluate',
+        data: {
+            implementation_name: '{{implementation_name}}',
+            text: evalText
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement);
+        },
+    });
+});
+
+</script>
 
 </body>
 </html>

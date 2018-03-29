@@ -162,7 +162,7 @@ def load_implementation():
     return 'Success!'
 
 
-@app.route('/implementations/listloaded', methods=['GET', 'POST'])
+@app.route('/implementations/list_loaded', methods=['GET', 'POST'])
 def list_loaded_implementations():
 
     loaded_implementation_list = env.list_loaded_implementations()
@@ -177,6 +177,15 @@ def create_implementation():
     implementation_name = request.args.get('implementation_name')
     env.create_implementation(model_name, training_name, implementation_name)
     return 'Success!'
+
+
+@app.route('/implementations/evaluate', methods=['GET', 'POST'])
+def evaluate_implementation():
+
+    implementation_name = request.args.get('implementation_name')
+    eval_text = request.args.get('text')
+    label = env.evaluate_implementation(implementation_name, eval_text)
+    return label
 
 
 # ----------Corpora----------
