@@ -9,50 +9,70 @@
 </head>
 <body>
 
-<h1>Model lab</h1>
+<div class="row fullwrapper">
 
-<div class="row">
+    <div class="col-md-1 gutter"></div>
 
-    <div class="col-md-6">
+    <div class="col-md-10 pagewrapper">
 
-        <h3>Implementation Contents for {{ implementation_name }} implementation:</h3>
+        <div class="row title-bar">
+            <div class="col-md-12">
+                <a href="/">
+                    <img id="ml-logo" src="/img/microscope.png" height="60">
+                </a>
+                <h1 id="ml-title">Model lab</h1>
 
-        <table>
-            <tr>
-                <td>
-                    Model: {{ implementation_config.get('model_name') }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Training: {{ implementation_config.get('training_name') }}
-                </td>
-            </tr>
-        </table>
-
-        <h3>Implementation Status</h3>
-        <div id="checkStatus" class="btn btn-default">Check Status</div>
-        <div id="loadImplementation" class="btn btn-default">Load Implementation</div>
-        <div id="implementationStatus">Unknown</div>
-
-        <br />
-        <br />
-
-        <h3>Evaluate Implementation</h3>
-        <input id="evaluateText" type="text" name="evalText">
-        <div id="evaluate" class="btn btn-default">Evaluate</div>
-
-    </div>
-    
-    <div class="col-md-6">
-        <iframe width="0" height="0" border="0" name="dummyframe" id="dummyframe"></iframe>
-        <div id="status-window">
-            Status Window
-            <div class="status-message">
-                Status Message
+                <h3 id="page-name">Implementation Details for: <span value="{{ implementation_name }}" id="implementationName">{{ implementation_name }}</span></h3>
             </div>
         </div>
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <h3>Implementation Contents for {{ implementation_name }} implementation:</h3>
+
+                <table>
+                    <tr>
+                        <td>
+                            Model: {{ implementation_config.get('model_name') }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Training: {{ implementation_config.get('training_name') }}
+                        </td>
+                    </tr>
+                </table>
+
+                <h3>Implementation Status</h3>
+                <div id="checkStatus" class="btn btn-default">Check Status</div>
+                <div id="loadImplementation" class="btn btn-default">Load Implementation</div>
+                <div id="implementationStatus">Unknown</div>
+
+                <br />
+                <br />
+
+                <h3>Evaluate Implementation</h3>
+                <input id="evaluateText" type="text" name="evalText">
+                <div id="evaluate" class="btn btn-default">Evaluate</div>
+
+            </div>
+
+            <div class="col-md-6">
+                <iframe width="0" height="0" border="0" name="dummyframe" id="dummyframe"></iframe>
+                <div id="status-window">
+                    Status Window
+                    <div class="status-message">
+                        Status Message
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
+
+    <div class="col-md-1 gutter"></div>
 
 </div>
 
@@ -101,7 +121,7 @@ $("#loadImplementation").click(function() {
 $("#evaluate").click(function() {
 
     console.log( "Handler for Evaluate called." );
-    var evalText = $('#evaluateText')[0].value; 
+    var evalText = $('#evaluateText')[0].value;
     $.ajax({
         url: '/implementations/evaluate',
         data: {

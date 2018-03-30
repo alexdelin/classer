@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import pickle
+import random
 
 
 class ModelLabEnv(object):
@@ -16,7 +17,7 @@ class ModelLabEnv(object):
             "implementations": {}
         }
 
-    # ----------Environment----------
+# ----------Environment----------
     def get_env_config(self, config_location='~/.model-lab.json'):
 
         if '~' in config_location:
@@ -35,7 +36,7 @@ class ModelLabEnv(object):
 
         return data_dir
 
-    # ----------Training----------
+# ----------Training----------
     def list_training(self):
 
         training_dir = self.data_dir + 'training'
@@ -114,7 +115,6 @@ class ModelLabEnv(object):
                 "label": training_label
             })
 
-
         self.write_training(training_name, new_training)
 
     def recommend_training(self, corpus_name, implementation_name, amount='10'):
@@ -124,9 +124,7 @@ class ModelLabEnv(object):
         except:
             raise ValueError('invalid amount specified')
 
-        corpus = self.get_corpus(corpus_name)
-        if len(corpus) > amount:
-            corpus = corpus[:amount]
+        corpus = self.get_corpus(corpus_name, amount)
 
         loaded_implementations = self.list_loaded_implementations()
         if implementation_name not in loaded_implementations:
@@ -324,7 +322,7 @@ class ModelLabEnv(object):
         corpora_dir = self.data_dir + 'corpora'
         return os.listdir(corpora_dir)
 
-    def get_corpus(self, corpus_name):
+    def get_corpus(self, corpus_name, amount=None):
 
         relative_corpus_path = 'corpora/{name}/corpus.json'.format(
                                     name=corpus_name)
@@ -332,5 +330,9 @@ class ModelLabEnv(object):
 
         with open(full_corpus_path, 'r') as corpus_file:
             corpus_data = json.load(corpus_file)
+
+        if amount:
+            selection = random.sample(corpus_data, amount)
+            return selection
 
         return corpus_data

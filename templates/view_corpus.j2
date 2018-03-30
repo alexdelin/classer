@@ -9,29 +9,49 @@
 </head>
 <body>
 
-<h1>Model lab</h1>
+<div class="row fullwrapper">
 
-<div class="row">
+    <div class="col-md-1 gutter"></div>
 
-    <div class="col-md-6">
+    <div class="col-md-10 pagewrapper">
 
-        <h3>Training Contents for {{ corpus_name }} corpus:</h3>
+        <div class="row title-bar">
+            <div class="col-md-12">
+                <a href="/">
+                    <img id="ml-logo" src="/img/microscope.png" height="60">
+                </a>
+                <h1 id="ml-title">Model lab</h1>
 
-        <table>
-            <tr>
-                <th>
-                    Text
-                </th>
-            </tr>
-            {% for example in corpus_content %}
-                <tr>
-                    <td>
-                        {{ example }}
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
+                <h3 id="page-name">Corpus Details for: <span value="{{ corpus_name }}" id="corpusName">{{ corpus_name }}</span></h3>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <h3>Training Contents for {{ corpus_name }} corpus:</h3>
+
+                <table>
+                    <tr>
+                        <th>
+                            Text
+                        </th>
+                    </tr>
+                    {% for example in corpus_content %}
+                        <tr>
+                            <td>
+                                {{ example }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+        </div>
     </div>
+
+    <div class="col-md-1 gutter"></div>
 
 </div>
 
