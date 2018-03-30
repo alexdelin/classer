@@ -34,10 +34,10 @@
 
                 <br />
 
-                <form id="addForm" action="/training/add_single" target="dummyframe">
-                    <input id="addLabel" type="text" name="label" placeholder="label" />
-                    <input id="addText" type="text" name="text" placeholder="text" />
-                    <select id="addTraining" name="training_name">
+                <form class="form-inline" id="addForm" action="/training/add_single" target="dummyframe">
+                    <input class="form-control" id="addLabel" type="text" name="label" placeholder="label" />
+                    <input class="form-control" id="addText" type="text" name="text" placeholder="text" />
+                    <select class="form-control" id="addTraining" name="training_name">
                         <option value="{{ training_name }}">{{ training_name }}</option>
                     </select>
                     <div id="addSubmit" class="btn btn-default">Submit</div>
@@ -47,8 +47,8 @@
 
                 <h3>Deduplicate Training</h3>
 
-                <form id="dedupForm" action="/training/deduplicate" target="dummyframe">
-                    <select id="dedupTraining" name="training_name">
+                <form class="form-inline" id="dedupForm" action="/training/deduplicate" target="dummyframe">
+                    <select class="form-control" id="dedupTraining" name="training_name">
                       <option value="{{ training_name }}">{{ training_name }}</option>
                     </select>
                     <div id="dedupSubmit" class="btn btn-default">Submit</div>
@@ -98,17 +98,20 @@
                     <div class="col-md-12">
                         <h3>Extend Training</h3>
                     </div>
-                    Implementation
-                    Corpus
-                    <form id="extendForm" action="/training/recommend" target="dummyframe">
-                        <select id="extendCorpus" name="corpus_name">
+                    <form class="form-inline" id="extendForm" action="/training/recommend" target="dummyframe">
+                        <label for="extendCorpus">Corpus </label><select class="form-control" id="extendCorpus" name="corpus_name">
                             {% for corpus in corpora %}
                             <option value="{{ corpus }}">{{ corpus }}</option>
                             {% endfor %}
                         </select>
-                        <select id="extendImplementation" name="implementation_name">
+                        <label for="extendImplementation">Implementation </label><select class="form-control" id="extendImplementation" name="implementation_name">
                             {% for implementation in implementations %}
                             <option value="{{ implementation }}">{{ implementation }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="extendConfidence">Confidence</label><select class="form-control" id="extendConfidence" name="extend_confidence">
+                            {% for confidence_level in range(50, 100, 5) %}
+                            <option value="{{ confidence_level }}">{{ confidence_level }}</option>
                             {% endfor %}
                         </select>
                         <div id="extendSubmit" class="btn btn-default">Extend</div>
@@ -121,6 +124,9 @@
                             </th>
                             <th>
                                 Suggested Label
+                            </th>
+                            <th>
+                                Confidence
                             </th>
                             <th>
                                 Action

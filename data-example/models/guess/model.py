@@ -11,7 +11,7 @@ class Model(object):
         pass
 
     def evaluate(self, text):
-        return random.choice(self.get_classes())
+        return random.choice(self.get_classes()), 100
 
     def get_classes(self):
         return ['pos', 'neg']

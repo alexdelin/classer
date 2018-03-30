@@ -153,9 +153,11 @@ def recommend_training():
     corpus_name = request.args.get('corpus_name')
     implementation_name = request.args.get('implementation_name')
     amount = request.args.get('amount', '10')
+    confidence = request.args.get('confidence')
 
     recommended_training = env.recommend_training(corpus_name,
-                                                  implementation_name, amount)
+                                                  implementation_name, amount,
+                                                  confidence)
     return json.dumps(recommended_training)
 
 

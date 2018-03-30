@@ -117,14 +117,19 @@ class ModelLabEnv(object):
 
         self.write_training(training_name, new_training)
 
-    def recommend_training(self, corpus_name, implementation_name, amount='10'):
-
+    def recommend_training(self, corpus_name, implementation_name,
+                           amount='10', confidence=None):
         try:
             amount = int(amount)
         except:
             raise ValueError('invalid amount specified')
 
-        corpus = self.get_corpus(corpus_name, amount)
+        if not confidence:
+            confidence = 0
+        else:
+            confidence = float(confidence) / 100
+
+        corpus = self.get_corpus(corpus_name)
 
         loaded_implementations = self.list_loaded_implementations()
         if implementation_name not in loaded_implementations:
@@ -132,12 +137,18 @@ class ModelLabEnv(object):
 
         recommendation = []
         for test_document in corpus:
-            expected_label = self.evaluate_implementation(implementation_name,
-                                                          test_document)
-            recommendation.append({
-                "text": test_document,
-                "label": expected_label
-            })
+            expected_label, label_prob = self.evaluate_implementation(
+                                                implementation_name,
+                                                test_document)
+            if label_prob >= confidence:
+                recommendation.append({
+                    "text": test_document,
+                    "label": expected_label,
+                    "confidence": label_prob
+                })
+
+            if len(recommendation) >= amount:
+                break
 
         return recommendation
 
@@ -315,8 +326,8 @@ class ModelLabEnv(object):
         if not self.cache['implementations'].get(implementation_name):
             raise ValueError('Selected Implementation is currently not loaded')
 
-        label = self.cache['implementations'][implementation_name].evaluate(text)
-        return label
+        label, label_prob = self.cache['implementations'][implementation_name].evaluate(text)
+        return label, label_prob
 
     def reimplement(self, implementation_name):
 

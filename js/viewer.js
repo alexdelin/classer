@@ -78,12 +78,14 @@ $("#extendSubmit").click(function() {
     var extendCorpus = $('#extendCorpus')[0].value
     var extendImplementation = $('#extendImplementation')[0].value
     var trainingName = $('#addTraining')[0].value
+    var extendConfidence = $('#extendConfidence')[0].value
 
     $.ajax({
         url: '/training/recommend',
         data: {
             "implementation_name": extendImplementation,
-            "corpus_name": extendCorpus
+            "corpus_name": extendCorpus,
+            "confidence": extendConfidence
         },
         success: function(response) {
             console.log(response)
@@ -93,7 +95,7 @@ $("#extendSubmit").click(function() {
             // Add recommendation to table
             loadedResponse = JSON.parse(response)
             _.each(loadedResponse, function(recElement) {
-                var rowElement = '<tr class="recommendation-row"><td class="recText">' + recElement['text'] + '</td><td class="recLabel">' + recElement['label'] + '</td><td><div class="btn btn-default addExample">Add</div></td></tr>'
+                var rowElement = '<tr class="recommendation-row"><td class="recText">' + recElement['text'] + '</td><td class="recLabel">' + recElement['label'] + '</td><td class="recConfidence">' + recElement['confidence'] + '</td><td><div class="btn btn-default addExample">Add</div></td></tr>'
                 $('#training-recommendations').append(rowElement)
             });
 
