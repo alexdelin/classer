@@ -247,7 +247,8 @@ class ModelLabEnv(object):
 
         implementation_config = {
             "model_name": model_name,
-            "training_name": training_name
+            "training_name": training_name,
+            "number_examples": len(training_content)
         }
 
         with open(implementation_config_path, 'w') as implementation_config_file:
@@ -293,8 +294,8 @@ class ModelLabEnv(object):
 
         implementation_object = self.cache['implementations'][implementation_name]
 
-        if os.path.exists(full_implementation_path):
-            raise ValueError('Implementation to create already exists')
+        #if os.path.exists(full_implementation_path):
+        #    raise ValueError('Implementation to create already exists')
 
         if not os.path.exists(os.path.dirname(full_implementation_path)):
             os.makedirs(os.path.dirname(full_implementation_path))
@@ -316,6 +317,19 @@ class ModelLabEnv(object):
 
         label = self.cache['implementations'][implementation_name].evaluate(text)
         return label
+
+    def reimplement(self, implementation_name):
+
+        implementation_config = self.get_implementation(implementation_name)
+        model_name = implementation_config.get('model_name')
+        training_name = implementation_config.get('training_name')
+
+        # Unload current implementation from memory
+        if implementation_name in self.list_loaded_implementations():
+            self.unload_implementation(implementation_name)
+
+        # Re-build Implementation
+        self.create_implementation(model_name, training_name, implementation_name)
 
 # ----------Corpora----------
     def list_corpora(self):

@@ -4,7 +4,8 @@
     <link rel="stylesheet" type="text/css" href="/css/model-lab.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="/js/viewer.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script type="text/javascript" src="/js/viewer.js" defer></script>
     <title>Model Lab</title>
 </head>
 <body>
@@ -48,6 +49,7 @@
                 <h3>Implementation Status</h3>
                 <div id="checkStatus" class="btn btn-default">Check Status</div>
                 <div id="loadImplementation" class="btn btn-default">Load Implementation</div>
+                <div id="reImplement" class="btn btn-default">Re-Implement</div>
                 <div id="implementationStatus">Unknown</div>
 
                 <br />
@@ -75,68 +77,6 @@
     <div class="col-md-1 gutter"></div>
 
 </div>
-
-<script type="text/javascript">
-
-$("#checkStatus").click(function() {
-
-    console.log( "Handler for Check Status called." );
-
-    $.ajax({
-        url: '/implementations/list_loaded',
-        data: {},
-        success: function(response) {
-            var parsed_response = JSON.parse(response);
-            console.log(parsed_response)
-            var newElement = '<div class="status-message">' + response + '</div>';
-            $('#status-window').append(newElement);
-
-            if (parsed_response.indexOf('{{implementation_name}}') >= 0) {
-                var currentStatus = 'Loaded'
-            } else {
-                var currentStatus = 'Not Loaded'
-            }
-            $('#implementationStatus')[0].innerHTML = currentStatus
-        },
-    });
-});
-
-$("#loadImplementation").click(function() {
-
-    console.log( "Handler for Load Implementation called." );
-
-    $.ajax({
-        url: '/implementations/load',
-        data: {
-            implementation_name: '{{implementation_name}}'
-        },
-        success: function(response) {
-            console.log(response)
-            var newElement = '<div class="status-message">' + response + '</div>';
-            $('#status-window').append(newElement);
-        },
-    });
-});
-
-$("#evaluate").click(function() {
-
-    console.log( "Handler for Evaluate called." );
-    var evalText = $('#evaluateText')[0].value;
-    $.ajax({
-        url: '/implementations/evaluate',
-        data: {
-            implementation_name: '{{implementation_name}}',
-            text: evalText
-        },
-        success: function(response) {
-            console.log(response)
-            var newElement = '<div class="status-message">' + response + '</div>';
-            $('#status-window').append(newElement);
-        },
-    });
-});
-
-</script>
 
 </body>
 </html>

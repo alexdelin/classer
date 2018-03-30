@@ -200,6 +200,14 @@ def create_implementation():
     return 'Success!'
 
 
+@app.route('/implementations/reimplement', methods=['GET', 'POST'])
+def reimplement():
+
+    implementation_name = request.args.get('implementation_name')
+    env.reimplement(implementation_name)
+    return 'Success!'
+
+
 @app.route('/implementations/evaluate', methods=['GET', 'POST'])
 def evaluate_implementation():
 

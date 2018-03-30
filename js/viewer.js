@@ -120,3 +120,140 @@ $("#extendSubmit").click(function() {
         },
     });
 });
+
+
+$("#createTraining").click(function() {
+
+    console.log( "Handler for Create Training called." );
+
+    var trainingName = $('#trainingName')[0].value
+    if (trainingName.length === 0) {
+        console.log('early exit')
+        return
+    }
+
+    $.ajax({
+        url: '/training/create',
+        data: {
+            training_name: trainingName
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement);
+        },
+    });
+});
+
+
+$("#createImplementation").click(function() {
+
+    console.log( "Handler for Create Implementation called." );
+
+    var impName = $('#impName')[0].value
+    if (impName.length === 0) {
+        console.log('early exit')
+        return
+    }
+
+    var trainingName = $('#impTrainingName')[0].value
+    var modelName = $('#impModelName')[0].value
+
+    $.ajax({
+        url: '/implementations/create',
+        data: {
+            implementation_name: impName,
+            training_name: trainingName,
+            model_name: modelName
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement);
+        },
+    });
+});
+
+
+$("#checkStatus").click(function() {
+
+    console.log( "Handler for Check Status called." );
+    var implementationName = $('#implementationName')[0].getAttribute('value')
+
+    $.ajax({
+        url: '/implementations/list_loaded',
+        data: {},
+        success: function(response) {
+            var parsed_response = JSON.parse(response);
+            console.log(parsed_response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement);
+
+            if (parsed_response.indexOf(implementationName) >= 0) {
+                var currentStatus = 'Loaded'
+            } else {
+                var currentStatus = 'Not Loaded'
+            }
+            $('#implementationStatus')[0].innerHTML = currentStatus
+        },
+    });
+});
+
+
+$("#loadImplementation").click(function() {
+
+    console.log( "Handler for Load Implementation called." );
+    var implementationName = $('#implementationName')[0].getAttribute('value')
+
+    $.ajax({
+        url: '/implementations/load',
+        data: {
+            implementation_name: implementationName
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement);
+        },
+    });
+});
+
+
+$("#evaluate").click(function() {
+
+    console.log( "Handler for Evaluate called." );
+    var implementationName = $('#implementationName')[0].getAttribute('value')
+    var evalText = $('#evaluateText')[0].value;
+
+    $.ajax({
+        url: '/implementations/evaluate',
+        data: {
+            implementation_name: implementationName,
+            text: evalText
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement);
+        },
+    });
+});
+
+
+$("#reImplement").click(function() {
+
+    console.log( "Handler for Re-Implement called." );
+    var implementationName = $('#implementationName')[0].getAttribute('value')
+
+    $.ajax({
+        url: '/implementations/reimplement',
+        data: {
+            implementation_name: implementationName
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement);
+        },
+    });
+});
