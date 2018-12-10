@@ -11,7 +11,7 @@ import json
 
 from flask import Flask, request, render_template, jsonify, send_from_directory
 
-from classer import ClasserEnv
+from classer.environment import ClasserEnv
 
 app = Flask(__name__)
 env = ClasserEnv()

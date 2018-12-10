@@ -8,14 +8,14 @@ import json
 import pickle
 import random
 
-from lib.models import MODEL_MANIFEST
-from lib.models.hash_nb import HashNBModel
-from lib.models.count_sgd import CountSGDModel
-from lib.models.tfidf_sgd import TFIDFSGDModel
-from lib.models.tfidf_svm import TFIDFSVMModel
-from lib.models.tfidf_mlp import TFIDFMLPModel
-from lib.utils.score import score_model
-from lib.utils.status import get_status
+from classer.models import MODEL_MANIFEST
+from classer.models.hash_nb import HashNBModel
+from classer.models.count_sgd import CountSGDModel
+from classer.models.tfidf_sgd import TFIDFSGDModel
+from classer.models.tfidf_svm import TFIDFSVMModel
+from classer.models.tfidf_mlp import TFIDFMLPModel
+from classer.utils.score import score_model
+from classer.utils.status import get_status
 
 
 class ClasserEnv(object):
