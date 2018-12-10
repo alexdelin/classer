@@ -1,24 +1,38 @@
+"""
+Classer - Text Classification as a service
+"""
+
 import os
 import sys
 import json
 import pickle
 import random
 
+from lib.models import MODEL_MANIFEST
+from lib.models.hash_nb import HashNBModel
+from lib.models.count_sgd import CountSGDModel
+from lib.models.tfidf_sgd import TFIDFSGDModel
+from lib.models.tfidf_svm import TFIDFSVMModel
+from lib.models.tfidf_mlp import TFIDFMLPModel
+from lib.utils.score import score_model
+from lib.utils.status import get_status
 
-class ModelLabEnv(object):
-    """docstring for ModelLabEnv"""
 
-    def __init__(self, config_file='~/.model-lab.json'):
+class ClasserEnv(object):
+    """docstring for ClasserEnv"""
+
+    def __init__(self, config_file='~/.classer.json'):
 
         self.env_config = self.get_env_config(config_file)
         self.data_dir = self.get_data_dir()
+        self.status_file = self.data_dir + 'status.json'
         self.cache = {
             "models": {},
             "implementations": {}
         }
 
 # ----------Environment----------
-    def get_env_config(self, config_location='~/.model-lab.json'):
+    def get_env_config(self, config_location='~/.classer.json'):
 
         if '~' in config_location:
             config_location = os.path.expanduser(config_location)
@@ -35,6 +49,10 @@ class ModelLabEnv(object):
             data_dir += '/'
 
         return data_dir
+
+    def get_current_status(self):
+
+        return get_status(self.status_file)
 
 # ----------Training----------
     def list_training(self):
@@ -130,6 +148,7 @@ class ModelLabEnv(object):
             confidence = float(confidence) / 100
 
         corpus = self.get_corpus(corpus_name)
+        random.shuffle(corpus)
 
         loaded_implementations = self.list_loaded_implementations()
         if implementation_name not in loaded_implementations:
@@ -154,54 +173,42 @@ class ModelLabEnv(object):
 
 # ----------Models----------
     def list_models(self):
+        '''List all available model types which can be used to create
+        implementations
+        '''
 
-        model_dir = self.data_dir + 'models'
-        return os.listdir(model_dir)
+        return MODEL_MANIFEST
 
-    def load_model(self, model_name):
+    def benchmark_model(self, model_name, training_name):
 
-        # Early Exit
-        if self.cache.get('models', {}).get(model_name):
-            raise ValueError('Model is already loaded!')
+        temp_data_dir = '{base}temp/'.format(base=self.data_dir)
 
-        relative_model_path = 'models/{name}/model.py'.format(name=model_name)
-        full_model_path = self.data_dir + relative_model_path
-        full_model_dir = os.path.dirname(full_model_path)
+        # make the temp folder if it doesn't exist already
+        if not os.path.exists(temp_data_dir):
+            os.makedirs(temp_data_dir)
 
-        loaded_model = self.load_model_class(full_model_dir)
+        if model_name == 'hash_nb':
+            loaded_model = HashNBModel(data_dir=temp_data_dir)
 
-        self.cache.setdefault('models', {})
-        self.cache['models'][model_name] = loaded_model
+        elif model_name == 'count_sgd':
+            loaded_model = CountSGDModel(data_dir=temp_data_dir)
 
-    def load_model_class(self, full_model_dir):
+        elif model_name == 'tfidf_sgd':
+            loaded_model = TFIDFSGDModel(data_dir=temp_data_dir)
 
-        sys.path.append(full_model_dir)
-        from model import Model
-        loaded_model = Model()
-        sys.path.remove(full_model_dir)
-        return loaded_model
+        elif model_name == 'tfidf_svm':
+            loaded_model = TFIDFSVMModel(data_dir=temp_data_dir)
 
-    def unload_model(self, model_name):
+        elif model_name == 'tfidf_mlp':
+            loaded_model = TFIDFMLPModel(data_dir=temp_data_dir)
 
-        if self.cache['models'].get(model_name):
-            del self.cache['models'][model_name]
         else:
-            raise ValueError('Selected model is currently not loaded')
+            raise ValueError('Unknown model type ' + model_name)
 
-    def train_model(self, model_name, training_set):
+        dataset = self.get_training(training_name)
 
-        if not self.cache['models'].get(model_name):
-            raise ValueError('Selected Model is currently not loaded')
-
-        self.cache['models'][model_name].train(training_set)
-
-    def evaluate_model(self, model_name, text):
-
-        if not self.cache['models'].get(model_name):
-            raise ValueError('Selected Model is currently not loaded')
-
-        label = self.cache['models'][model_name].evaluate(text)
-        return label
+        benchmark = score_model(loaded_model, dataset, self.status_file)
+        return benchmark
 
 # ----------Implementations----------
     def list_implementations(self):
@@ -211,7 +218,6 @@ class ModelLabEnv(object):
 
     def list_loaded_implementations(self):
         loaded_implementations = self.cache['implementations'].keys()
-        print loaded_implementations
         return loaded_implementations
 
     def get_implementation(self, implementation_name):
@@ -233,12 +239,25 @@ class ModelLabEnv(object):
         if self.cache.get('implementations', {}).get(implementation_name):
             raise ValueError('Implementation already exists!')
 
-        # Load Selected Model
-        relative_model_path = 'models/{name}/model.py'.format(name=model_name)
-        full_model_path = self.data_dir + relative_model_path
-        full_model_dir = os.path.dirname(full_model_path)
+        implementation_data_dir = '{base}implementations/{name}/'.format(
+                                        base=self.data_dir,
+                                        name=implementation_name)
 
-        loaded_model = self.load_model_class(full_model_dir)
+        # make the implementation folder if it doesn't exist already
+        if not os.path.exists(implementation_data_dir):
+            os.makedirs(implementation_data_dir)
+
+        if model_name == 'hash_nb':
+            loaded_model = HashNBModel(data_dir=implementation_data_dir)
+
+        elif model_name == 'tfidf_sgd':
+            loaded_model = TFIDFSGDModel(data_dir=implementation_data_dir)
+
+        elif model_name == 'tfidf_svm':
+            loaded_model = TFIDFSVMModel(data_dir=implementation_data_dir)
+
+        else:
+            raise ValueError('Unknown model type ' + model_name)
 
         self.cache.setdefault('implementations', {})
         self.cache['implementations'][implementation_name] = loaded_model
@@ -251,10 +270,10 @@ class ModelLabEnv(object):
         self.save_implementation(implementation_name)
 
         # Write Implementation Config
-        relative_implementation_config_path = 'implementations/{name}/'\
-                                              'implementation.json'.format(
-                                                    name=implementation_name)
-        implementation_config_path = self.data_dir + relative_implementation_config_path
+        implementation_config_path = '{base}implementations/{name}/'\
+                                     'implementation.json'.format(
+                                        base=self.data_dir,
+                                        name=implementation_name)
 
         implementation_config = {
             "model_name": model_name,
@@ -298,6 +317,8 @@ class ModelLabEnv(object):
 
     def save_implementation(self, implementation_name):
 
+        # TODO - Implement this in the library, and just call the .save() method
+
         relative_implementation_path = 'implementations/{name}/'\
                                        'implementation.pickle'.format(
                                             name=implementation_name)
@@ -326,8 +347,8 @@ class ModelLabEnv(object):
         if not self.cache['implementations'].get(implementation_name):
             raise ValueError('Selected Implementation is currently not loaded')
 
-        label, label_prob = self.cache['implementations'][implementation_name].evaluate(text)
-        return label, label_prob
+        prediction = self.cache['implementations'][implementation_name].predict(text)
+        return prediction
 
     def reimplement(self, implementation_name):
 

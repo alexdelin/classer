@@ -35,4 +35,5 @@
 #status-window {
     background-color: #aaa;
     height: 250px;
+    overflow: scroll;
 }

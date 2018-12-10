@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/css/model-lab.css">
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <script type="text/javascript" src="/js/jquery.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="></script>
+    <script type="text/javascript" src="/js/underscore.js"></script>
+    <script type="text/javascript" src="/js/highcharts.js"></script>
+    <script type="text/javascript" src="/js/heatmap.js"></script>
+    <script type="text/javascript" src="/js/graphs.js" defer></script>
+    <script type="text/javascript" src="/js/viewer.js" defer></script>
+    <title>Model Lab</title>
+</head>
+<body>
+
+<div class="row fullwrapper">
+
+    <div class="col-md-1 gutter"></div>
+
+    <div class="col-md-10 pagewrapper">
+
+        <div class="row title-bar">
+            <div class="col-md-12">
+                <a href="/">
+                    <img id="ml-logo" src="/img/microscope.png" height="60">
+                </a>
+                <h1 id="ml-title">Model lab</h1>
+
+                <h3 id="page-name">Model Details for: <span value="{{ model_name }}" id="modelName">{{ model_name }}</span></h3>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+
+                <!-- Model Details -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2>Details for {{ model_name }}</h2>
+                        Coming Soon!
+                    </div>
+                </div>
+
+                <!-- Benchmarking -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2>Benchmark Model</h2>
+                        Training:<select id="benchmarkTrainingName">
+                            {% for training in trainings%}
+                                <option>{{ training }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <div id="benchmark" class="btn btn-default">Run</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+                <iframe width="0" height="0" border="0" name="dummyframe" id="dummyframe"></iframe>
+                <div id="status-window">
+                    Status Window
+                    <div class="status-message">
+                        Status Message
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-12" id="benchmarkResults">
+
+                <div class="row">
+                    <div class="col-md-6" id="totalConfusionMatrix">
+                        Total Confusion Matrix
+                    </div>
+                    <div class="col-md-6" id="totalConfusionStats">
+                        Total Confusion Stats
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6" id="maxConfusionMatrix">
+                        Max Confusion Matrix
+                    </div>
+                    <div class="col-md-6" id="maxConfusionStats">
+                        Max Confusion Stats
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6" id="thresholdConfusionMatrix">
+                        Threshold Confusion Matrix
+                    </div>
+                    <div class="col-md-6" id="thresholdConfusionStats">
+                        Threshold Confusion Stats
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-1 gutter"></div>
+
+</div>
+
+</body>
+</html>
