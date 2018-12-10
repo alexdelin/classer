@@ -1,18 +1,20 @@
 #!/opt/squirro/virtualenv/bin/python
 
 '''
-This is a template for a flask app
+CLASSER
+
+This is a flask app that manages and hosts server-side text classifiers
+that can be consumed as a web service
 '''
 
 import json
 
 from flask import Flask, request, render_template, jsonify, send_from_directory
 
-from modellab import ModelLabEnv
-
+from classer import ClasserEnv
 
 app = Flask(__name__)
-env = ModelLabEnv()
+env = ClasserEnv()
 
 
 @app.route('/env', methods=['GET'])
@@ -38,6 +40,9 @@ def send_css(path):
 def send_img(path):
     return send_from_directory('img', path)
 
+@app.route('/status', methods=['GET', 'POST'])
+def get_status():
+    return env.get_current_status()
 
 # ----------UI----------
 @app.route('/', methods=['GET'])
@@ -63,6 +68,14 @@ def view_training(path):
     return render_template('view_training.j2', training_name=training_name,
                            training_content=training_content,
                            corpora=corpora, implementations=implementations)
+
+
+@app.route('/view/model/<path:path>', methods=['GET'])
+def view_model(path):
+    model_name = path
+    training_list = env.list_training()
+    return render_template('view_model.j2', model_name=model_name,
+                           trainings=training_list)
 
 
 @app.route('/view/implementation/<path:path>', methods=['GET'])
@@ -169,6 +182,16 @@ def list_models():
     return jsonify(model_list)
 
 
+@app.route('/models/benchmark', methods=['GET', 'POST'])
+def benchmark_model():
+
+    model_name = request.args.get('model_name')
+    training_name = request.args.get('training_name')
+
+    benchmark = env.benchmark_model(model_name, training_name)
+    return json.dumps(benchmark)
+
+
 # ----------Implementations----------
 @app.route('/implementations/list', methods=['GET', 'POST'])
 def list_implementations():
@@ -215,8 +238,12 @@ def evaluate_implementation():
 
     implementation_name = request.args.get('implementation_name')
     eval_text = request.args.get('text')
-    label = env.evaluate_implementation(implementation_name, eval_text)
-    return label
+
+    if not isinstance(eval_text, list):
+        eval_text = [eval_text]
+
+    prediction = env.evaluate_implementation(implementation_name, eval_text)
+    return json.dumps(prediction)
 
 
 # ----------Corpora----------

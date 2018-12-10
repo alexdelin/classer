@@ -245,7 +245,7 @@ $("#evaluate").click(function() {
 $("#reImplement").click(function() {
 
     console.log( "Handler for Re-Implement called." );
-    var implementationName = $('#implementationName')[0].getAttribute('value')
+    var implementationName = $('#implementationName')[0].getAttribute('value');
 
     $.ajax({
         url: '/implementations/reimplement',
@@ -258,4 +258,26 @@ $("#reImplement").click(function() {
             $('#status-window').append(newElement);
         },
     });
+});
+
+
+$("#benchmark").click(function() {
+
+    console.log( "Handler for Benchmark called." );
+    var modelName = $('#modelName')[0].getAttribute('value');
+    var trainingName = $('#benchmarkTrainingName')[0].value
+
+    $.ajax({
+        url: '/models/benchmark',
+        data: {
+            model_name: modelName,
+            training_name: trainingName
+        },
+        success: function(response) {
+            console.log(response)
+            var newElement = '<div class="status-message">' + response + '</div>';
+            $('#status-window').append(newElement);
+            drawBenchmarkResults(response)
+        }
+    })
 });
