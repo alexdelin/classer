@@ -16,6 +16,7 @@ from classer.models.tfidf_svm import TFIDFSVMModel
 from classer.models.tfidf_mlp import TFIDFMLPModel
 from classer.utils.score import score_model
 from classer.utils.status import get_status
+from classer.utils.files import ensure_dir, ensure_file
 
 
 class ClasserEnv(object):
@@ -25,6 +26,7 @@ class ClasserEnv(object):
 
         self.env_config = self.get_env_config(config_file)
         self.data_dir = self.get_data_dir()
+        self.ensure_data_dir_contents()
         self.status_file = self.data_dir + 'status.json'
         self.cache = {
             "models": {},
@@ -45,6 +47,10 @@ class ClasserEnv(object):
     def get_data_dir(self):
 
         data_dir = self.env_config.get('data-dir')
+        
+        if '~' in data_dir:
+            data_dir = os.path.expanduser(data_dir)
+
         if data_dir[-1] != '/':
             data_dir += '/'
 
@@ -53,6 +59,17 @@ class ClasserEnv(object):
     def get_current_status(self):
 
         return get_status(self.status_file)
+
+    def ensure_data_dir_contents(self):
+        
+        # Ensure that the data dir exists
+        ensure_dir(self.data_dir)
+        print(self.data_dir + 'training')
+
+        # Ensure that all sub-dirs exist
+        ensure_dir(self.data_dir + 'training')
+        ensure_dir(self.data_dir + 'implementations')
+        ensure_dir(self.data_dir + 'corpora')
 
 # ----------Training----------
     def list_training(self):
