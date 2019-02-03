@@ -282,8 +282,9 @@ $("#benchmark").click(function() {
             drawBenchmarkResults(response)
             updateProgressBar('done')
         },
-        error: function() {
-            updateProgressBar('error')
+        error: function(response) {
+            var errorMessage = JSON.parse(response.responseText)['error']
+            updateProgressBar('error', errorMessage)
         }
     })
 });

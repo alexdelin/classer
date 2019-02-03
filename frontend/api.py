@@ -40,9 +40,11 @@ def send_css(path):
 def send_img(path):
     return send_from_directory('img', path)
 
+
 @app.route('/status', methods=['GET', 'POST'])
 def get_status():
     return env.get_current_status()
+
 
 # ----------UI----------
 @app.route('/', methods=['GET'])
@@ -188,8 +190,11 @@ def benchmark_model():
     model_name = request.args.get('model_name')
     training_name = request.args.get('training_name')
 
-    benchmark = env.benchmark_model(model_name, training_name)
-    return json.dumps(benchmark)
+    try:
+        benchmark = env.benchmark_model(model_name, training_name)
+        return json.dumps(benchmark)
+    except Exception as e:
+        return json.dumps({'error': unicode(e)}), 500
 
 
 # ----------Implementations----------
