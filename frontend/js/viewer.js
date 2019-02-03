@@ -281,6 +281,9 @@ $("#benchmark").click(function() {
             $('#status-window').append(newElement);
             drawBenchmarkResults(response)
             updateProgressBar('done')
+        },
+        error: function() {
+            updateProgressBar('error')
         }
     })
 });
