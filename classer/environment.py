@@ -14,6 +14,7 @@ from classer.models.count_sgd import CountSGDModel
 from classer.models.tfidf_sgd import TFIDFSGDModel
 from classer.models.tfidf_svm import TFIDFSVMModel
 from classer.models.tfidf_mlp import TFIDFMLPModel
+from classer.models.glove_rnn import GloveRNNModel
 from classer.utils.score import score_model
 from classer.utils.status import get_status
 from classer.utils.files import ensure_dir, ensure_file
@@ -47,7 +48,7 @@ class ClasserEnv(object):
     def get_data_dir(self):
 
         data_dir = self.env_config.get('data-dir')
-        
+
         if '~' in data_dir:
             data_dir = os.path.expanduser(data_dir)
 
@@ -61,7 +62,7 @@ class ClasserEnv(object):
         return get_status(self.status_file)
 
     def ensure_data_dir_contents(self):
-        
+
         # Ensure that the data dir exists
         ensure_dir(self.data_dir)
         print(self.data_dir + 'training')
@@ -218,6 +219,9 @@ class ClasserEnv(object):
 
         elif model_name == 'tfidf_mlp':
             loaded_model = TFIDFMLPModel(data_dir=temp_data_dir)
+
+        elif model_name == 'glove_rnn':
+            loaded_model = GloveRNNModel(data_dir=temp_data_dir)
 
         else:
             raise ValueError('Unknown model type ' + model_name)
