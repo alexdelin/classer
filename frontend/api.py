@@ -197,6 +197,17 @@ def benchmark_model():
         return json.dumps({'error': unicode(e)}), 500
 
 
+@app.route('/models/benchmark/status', methods=['GET'])
+def get_benchmark_status():
+
+    try:
+        status = env.get_benchmark_progress()
+        return json.dumps(status)
+    except Exception as e:
+        raise e
+        return json.dumps({'error': unicode(e)}), 404
+
+
 # ----------Implementations----------
 @app.route('/implementations/list', methods=['GET', 'POST'])
 def list_implementations():
@@ -260,4 +271,4 @@ def list_corpora():
 
 
 if __name__ == "__main__":
-    app.run(port=8181, debug=True)
+    app.run(port=8181, debug=True, threaded=True)

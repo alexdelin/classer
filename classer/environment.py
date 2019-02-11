@@ -199,6 +199,9 @@ class ClasserEnv(object):
 
     def benchmark_model(self, model_name, training_name):
 
+        if self.cache.get('benchmark'):
+            raise ValueError('A benchmark job is already running!')
+
         temp_data_dir = '{base}temp/'.format(base=self.data_dir)
 
         # make the temp folder if it doesn't exist already
@@ -226,10 +229,23 @@ class ClasserEnv(object):
         else:
             raise ValueError('Unknown model type ' + model_name)
 
+        self.cache['benchmark'] = loaded_model
         dataset = self.get_training(training_name)
 
-        benchmark = score_model(loaded_model, dataset, self.status_file)
+        benchmark = score_model(self.cache['benchmark'], dataset, self.status_file)
+        del self.cache['benchmark']
         return benchmark
+
+    def get_benchmark_progress(self):
+        '''Get progress for an in-progress benchmarking task
+        if applicable. This only works because you can run one
+        benchmarking task at a time
+        '''
+
+        if not self.cache.get('benchmark'):
+            raise ValueError('No benchmark task currently running')
+        else:
+            return self.cache['benchmark'].get_status()
 
 # ----------Implementations----------
     def list_implementations(self):
