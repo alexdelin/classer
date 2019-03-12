@@ -12,7 +12,7 @@ $ python setup.py develop
 
 ## Setup
 
-Before running classer, create your config file at `~/.classer.json`. You can create this by copying the sample version in `cofig/example_config.json` then editing the file as needed. 
+Before running classer, create your config file at `~/.classer.json`. You can create this by copying the sample version in `cofig/example_config.json` then editing the file as needed.
 
 ```bash
 $ cp config/example_config.json ~/.classer.json
@@ -33,3 +33,12 @@ $ python api.py
 ```
 
 With classer running, you can go to the address `http://localhost:8181` in a browser to set up and use classer
+
+### Install Sample Datasets
+
+To install the sample datasets, navigate to the sample datasets directory and run the upload script
+
+```bash
+$ cd sample_datasets
+$ python upload_samples.py
+```
