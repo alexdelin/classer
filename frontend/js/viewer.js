@@ -267,6 +267,8 @@ $("#benchmark").click(function() {
     var modelName = $('#modelName')[0].getAttribute('value');
     var trainingName = $('#benchmarkTrainingName')[0].value
 
+    updateProgressBar('running');
+
     $.ajax({
         url: '/models/benchmark',
         data: {
@@ -278,6 +280,11 @@ $("#benchmark").click(function() {
             var newElement = '<div class="status-message">' + response + '</div>';
             $('#status-window').append(newElement);
             drawBenchmarkResults(response)
+            updateProgressBar('done')
+        },
+        error: function(response) {
+            var errorMessage = JSON.parse(response.responseText)['error']
+            updateProgressBar('error', errorMessage)
         }
     })
 });
