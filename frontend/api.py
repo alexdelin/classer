@@ -102,7 +102,7 @@ def view_corpus(path):
 def list_training():
 
     training_list = env.list_training()
-    return jsonify(training_list)
+    return json.dumps(training_list)
 
 
 @app.route('/training/create', methods=['GET', 'POST'])
