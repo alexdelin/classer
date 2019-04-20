@@ -1,4 +1,4 @@
-#!/opt/squirro/virtualenv/bin/python
+#!/usr/bin/env/python
 
 '''
 CLASSER
