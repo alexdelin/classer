@@ -6,7 +6,7 @@ from random import shuffle
 
 import numpy as np
 
-from status import set_status
+from classer.utils.status import set_status
 
 
 def score_model(model, data, status_file, test_split=0.1, min_samples=10, iterations=3):
@@ -45,7 +45,7 @@ def score_model(model, data, status_file, test_split=0.1, min_samples=10, iterat
     list_stats = {}
 
     for single_iteration in all_iterations:
-        for it_stat, it_confusion in single_iteration.iteritems():
+        for it_stat, it_confusion in single_iteration.items():
 
             if it_stat not in overall_stats.keys():
                 overall_stats[it_stat] = it_confusion
@@ -54,8 +54,8 @@ def score_model(model, data, status_file, test_split=0.1, min_samples=10, iterat
 
     full_stats = calculate_full_stats(overall_stats, label_map)
 
-    for stat_name, stat_data in full_stats.iteritems():
-        if type(stat_data) not in [list, dict, basestring, unicode]:
+    for stat_name, stat_data in full_stats.items():
+        if type(stat_data) not in [list, dict, str]:
             list_stats[stat_name] = stat_data.tolist()
         else:
             list_stats[stat_name] = stat_data
@@ -140,7 +140,7 @@ def calculate_full_stats(confusion_stats, label_map):
     """
 
     inverse_label_map = {}
-    for label_name, label_index in label_map.iteritems():
+    for label_name, label_index in label_map.items():
         inverse_label_map[label_index] = label_name
 
     total_confusion = confusion_stats['confusion']

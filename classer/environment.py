@@ -133,7 +133,7 @@ class ClasserEnv(object):
         for example in training_contents:
 
             if not example.get('text') or not example.get('label'):
-                print 'Skipping example with missing text or label'
+                print('Skipping example with missing text or label')
                 continue
 
             if unzipped_training.get(example.get('text')):
@@ -145,7 +145,7 @@ class ClasserEnv(object):
                 unzipped_training[example.get('text')] = example.get('label')
 
         new_training = []
-        for training_text, training_label in unzipped_training.iteritems():
+        for training_text, training_label in unzipped_training.items():
             new_training.append({
                 "text": training_text,
                 "label": training_label

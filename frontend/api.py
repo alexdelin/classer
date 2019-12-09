@@ -22,7 +22,7 @@ def get_env_details():
     """Main Route that displays the documentation"""
 
     env_config = env.get_env_config()
-    print env_config
+    print(env_config)
     return jsonify(env_config)
 
 
@@ -194,7 +194,8 @@ def benchmark_model():
         benchmark = env.benchmark_model(model_name, training_name)
         return json.dumps(benchmark)
     except Exception as e:
-        return json.dumps({'error': unicode(e)}), 500
+        raise e
+        return json.dumps({'error': str(e)}), 500
 
 
 @app.route('/models/benchmark/status', methods=['GET'])
@@ -205,7 +206,7 @@ def get_benchmark_status():
         return json.dumps(status)
     except Exception as e:
         raise e
-        return json.dumps({'error': unicode(e)}), 404
+        return json.dumps({'error': str(e)}), 404
 
 
 # ----------Implementations----------

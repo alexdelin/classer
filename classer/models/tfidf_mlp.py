@@ -42,7 +42,7 @@ class TFIDFMLPModel(object):
             return json.load(status_file_object)
 
     def set_status(self, status):
-        print status
+        print(status)
         with open(self.status_file, 'w') as status_file_object:
             json.dump({"status": status}, status_file_object)
 

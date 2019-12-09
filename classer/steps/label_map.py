@@ -4,7 +4,7 @@ Label Map Step
 
 import json
 
-from base import BaseStep
+from classer.steps.base import BaseStep
 
 
 class LabelMapStep(BaseStep):
