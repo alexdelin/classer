@@ -7,7 +7,7 @@ import json
 
 import requests
 
-API_BASE_URL = 'http://localhost:8181'
+API_BASE_URL = 'http://localhost:8182'
 
 TRAININGS = {
     'Movie Sentiment': 'movie_sentiment_training.json',
