@@ -16,7 +16,7 @@ TRAININGS = {
 }
 
 
-for training_name, training_path in TRAININGS.iteritems():
+for training_name, training_path in TRAININGS.items():
 
     print('Loading Training {name}'.format(name=training_name))
 
