@@ -405,7 +405,7 @@ class ClasserEnv(object):
         corpora_dir = self.data_dir + 'corpora'
         return os.listdir(corpora_dir)
 
-    def get_corpus(self, corpus_name, amount=None):
+    def get_corpus(self, corpus_name, limit=0, offset=0, random_order=False):
 
         relative_corpus_path = 'corpora/{name}/corpus.json'.format(
                                     name=corpus_name)
@@ -414,8 +414,18 @@ class ClasserEnv(object):
         with open(full_corpus_path, 'r') as corpus_file:
             corpus_data = json.load(corpus_file)
 
-        if amount:
-            selection = random.sample(corpus_data, amount)
-            return selection
+        if random_order:
+            if limit:
+                return random.sample(corpus_data, limit)
+            else:
+                return random.shuffle(corpus_data)
+        if limit or offset:
+            return corpus_data[offset:offset + limit]
+        else:
+            return corpus_data
 
-        return corpus_data
+    def create_corpus(self, corpus_name, corpus_content):
+        pass
+
+    def append_to_corpus(self, corpus_name, content):
+        pass
