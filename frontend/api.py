@@ -109,7 +109,9 @@ def list_training():
 def create_training():
 
     training_name = request.args.get('training_name')
-    training_content = request.args.get('training_data')
+    training_content = json.loads(request.get_data())
+    if not training_content:
+        raise ValueError('No Content Provided for Training')
     env.create_training(training_name, training_content)
     return 'Success!'
 
@@ -272,4 +274,4 @@ def list_corpora():
 
 
 if __name__ == "__main__":
-    app.run(port=8181, debug=True, threaded=True)
+    app.run(port=8182, debug=True, threaded=True)
