@@ -1,0 +1,100 @@
+# Classer Specification
+
+## Principles
+Classer should facilitate working with **much** larger datasets than can fit in memory. This includes all tasks from assembling a corpora or training set, fetching arbitrary chosen or random subsets of a corpus or training set, appending new content to a corpus or training set, and finally creating a trained model from a training set
+
+To keep things as simple, portable, and lightweight as possible, classer should lean on the GNU coreutils as much as possible for doing basic operations on data stored on the filesystem. The structure of resources on the filesystem should be chosen in order to better facilitate this
+
+## Terminology
+{Corpus} A set of unlabeled examples which is typically very large
+{Training} A set of examples with one or more labels attached to each example. These examples are treated as a single set and are not split into training and test subsets
+{Model} A model is an algorithm used to learn the correlation between examples and labels, and can be used to predict the labels which are associated with any given example.
+{Experiment} An experiment is the combination of a specific training set and a given model. Experiments are meant to represent specific tasks so that they can be tracked as either the model improves or the training set is changed.
+
+## Filesystem Structure
+Everything used by Classer is stored on the filesystem
+
+```
+data-directory/
+    corpora/
+        <corpora-name>/
+            <corpora-name>-config.json
+            <corpora-name>-001.txt
+            <corpora-name>-002.txt
+            ...
+            <corpora-name>-NNN.txt
+    experiments/
+        <experiment-name>/
+            <experiment-name>-results.json
+            <experiment-name>-config.json
+            <experiment-name>-implementation.pickle
+    models/
+        <model-name>/
+            ???
+    training/
+        <training-name>/
+            <training-name>-config.json
+            <training-name>-001.jsonl
+            <training-name>-002.jsonl
+            ...
+            <training-name>-NNN.jsonl
+    tmp/
+        status.json
+        label_map.json
+```
+
+### Corpora Directory
+Corpora are intended to be extremely large datasets, so corpora handling is designed to leverage optimized low-level tooling as much as possible.
+
+Corpora are stored in UTF-8 encoded plain text files, with a simple format of one example per line. Aside from the UTF-8 limitation, the only other formatting quirk is that examples will have newlines escaped to `\n`. This is the only transformation done, and should be done transparently so that any components working with corpora via the API will not even be aware of this restriction.
+
+To better accommodate extremely large corpora, each corpus is split into shards which are limited to a configurable number of examples each. By default this number is 100,000, but can be modified as needed for different use cases on a per-corpus basis.
+
+Corpus config has the form:
+```json
+{
+    "examples-per-file": 100000
+}
+```
+
+Each file which composes a corpus has the form:
+```
+$ cat sample-001.txt
+This is the fist example
+This is the second example
+This is the third example
+These can include escaped\nnewline characters
+```
+
+### Training Directory
+
+```json
+{"text": "I did not like this restaurant at all", "label": "neg"}
+{"text": "This was the best movie that I have ever seen", "label": "pos"}
+{"text": "I would not advise anyone to take this class", "label": "neg"}
+{"text": "This is easily one of my favorite products", "label": "pos"}
+```
+
+### Experiments Directory
+### Temp Directory
+
+## API
+The API for classer should be consistent between what can be accessed via the Python Library and what can be accessed via the HTTP API
+
+### Corpus API
+- List Corpora
+- Get Corpus
+- Create Corpus
+- Append to Corpus
+
+### Training API
+- List Training
+- Create Training
+- Get Training
+- Write Training
+- Append to Training
+- De-duplicate Training
+- Recommend Training
+
+### Model API
+### Experiment API
