@@ -1,7 +1,8 @@
 # Classer Specification
 
 ## Principles
-Classer should facilitate working with **much** larger datasets than can fit in memory. This includes all tasks from assembling a corpora or training set, fetching arbitrary chosen or random subsets of a corpus or training set, appending new content to a corpus or training set, and finally creating a trained model from a training set
+Classer should facilitate working with **much** larger datasets than can fit in memory. This includes all tasks from assembling a corpora or training set, fetching arbitrary chosen or random subsets of a corpus or training set, appending new content to a corpus or training set, and finally creating a trained model from a training set.
+In theory, it should be _possible_, but not necessarily _performant_ to work with a 1TB corpus to create a 100GB training set and use that to train a model using a machine with the resources of a Raspberry Pi.
 
 To keep things as simple, portable, and lightweight as possible, classer should lean on the GNU coreutils as much as possible for doing basic operations on data stored on the filesystem. The structure of resources on the filesystem should be chosen in order to better facilitate this
 
@@ -9,7 +10,8 @@ To keep things as simple, portable, and lightweight as possible, classer should 
 {Corpus} A set of unlabeled examples which is typically very large
 {Training} A set of examples with one or more labels attached to each example. These examples are treated as a single set and are not split into training and test subsets
 {Model} A model is an algorithm used to learn the correlation between examples and labels, and can be used to predict the labels which are associated with any given example.
-{Experiment} An experiment is the combination of a specific training set and a given model. Experiments are meant to represent specific tasks so that they can be tracked as either the model improves or the training set is changed.
+{Implementation} An implementation is the combination of a specific training set and a given model. Implementations are meant to represent specific tasks so that they can be tracked as either the model improves or the training set is changed.
+{Experiment} An experiment is a one-off run of an implementation, where a corresponding implementation does not need to exist for that combination of training and model, and the results are not stored permanently
 
 ## Filesystem Structure
 Everything used by Classer is stored on the filesystem
@@ -23,14 +25,6 @@ data-directory/
             <corpora-name>-002.txt
             ...
             <corpora-name>-NNN.txt
-    experiments/
-        <experiment-name>/
-            <experiment-name>-results.json
-            <experiment-name>-config.json
-            <experiment-name>-implementation.pickle
-    models/
-        <model-name>/
-            ???
     training/
         <training-name>/
             <training-name>-config.json
@@ -38,6 +32,11 @@ data-directory/
             <training-name>-002.jsonl
             ...
             <training-name>-NNN.jsonl
+    implementations/
+        <implementation-name>/
+            <implementation-name>-results.jsonl
+            <implementation-name>-config.json
+            <implementation-name>-implementation.pickle
     tmp/
         status.json
         label_map.json
@@ -46,11 +45,11 @@ data-directory/
 ### Corpora Directory
 Corpora are intended to be extremely large datasets, so corpora handling is designed to leverage optimized low-level tooling as much as possible.
 
-Corpora are stored in UTF-8 encoded plain text files, with a simple format of one example per line. Aside from the UTF-8 limitation, the only other formatting quirk is that examples will have newlines escaped to `\n`. This is the only transformation done, and should be done transparently so that any components working with corpora via the API will not even be aware of this restriction.
+Corpora are stored in UTF-8 encoded plain text files, with a simple format of one example per line. Aside from the UTF-8 limitation, the only other formatting quirk is that the text files will have newlines escaped to `\n` and literal backslash characters escaped to `\\`. These are the only transformations done, and should be done transparently so that any components working with corpora via the API will not even be aware of these changes being made.
 
 To better accommodate extremely large corpora, each corpus is split into shards which are limited to a configurable number of examples each. By default this number is 100,000, but can be modified as needed for different use cases on a per-corpus basis.
 
-Corpus config has the form:
+Each corpus has a config file with the following form:
 ```json
 {
     "examples-per-file": 100000
@@ -59,7 +58,6 @@ Corpus config has the form:
 
 Each file which composes a corpus has the form:
 ```
-$ cat sample-001.txt
 This is the fist example
 This is the second example
 This is the third example
@@ -67,6 +65,8 @@ These can include escaped\nnewline characters
 ```
 
 ### Training Directory
+Similar to Corpora, training sets are expected to grow arbitrarily large, and shouldn't be expected to be able to fit in memory.
+To be able-to leverage command-line tools while supporting many different types of training set types and formats, jsonl format is used. Each line is independently expected to be a valid JSON object, and lines can be grabbed independently to fetch subsets of the training or shuffled as needed.
 
 ```json
 {"text": "I did not like this restaurant at all", "label": "neg"}
@@ -75,8 +75,110 @@ These can include escaped\nnewline characters
 {"text": "This is easily one of my favorite products", "label": "pos"}
 ```
 
-### Experiments Directory
+Training sets also have very simple configuration associated with them, which are stored in json format
+```json
+{
+    "labels": ["pos", "neg"]
+}
+```
+
+### Implementations Directory
+Implementations have the most configuration because they have the most components involved. The main configuration file for an implementation has the form:
+```json
+{
+    "training": {
+        "name": "sentiment"
+    },
+    "model": {
+        "name": "tfidf_sgd",
+        "config": {
+            "max_features": 20000,
+            "stop_words": "english",
+            "ngram_range": [1,2],
+            "strip_accents": "unicode",
+            "sublinear_tf": true,
+            "max_df": 0.5
+        }
+    },
+    "benchmark": {
+        "training_fraction": 80,
+        "num_runs": 20
+    }
+}
+```
+
+Implementations also track the historical performance of benchmarking tasks run for the implementation. As these can be scheduled to run regularly and there can be lots of history for benchmark runs, these results are stored in jsonl format, with one benchmark result per line. **Each line** in the results file has the form:
+```json
+{
+    "timestamp": "2020-01-29T14:01:23",
+    "parameters": {
+        "num_runs": 20,
+        "training_fraction": 80
+    },
+    "results": {
+        "confusion": [
+            [33.65934454199009, 23.340655458009913],
+            [24.962697235219824, 47.03730276478018]
+        ],
+        "max_confusion": [
+            [39.0, 18.0],
+            [12.0, 60.0]
+        ],
+        "threshold_confusion": [
+            [20.0, 5.0, 32.0],
+            [8.0, 34.0, 30.0]
+        ],
+        "total_precision": {
+            "pos": 0.5741755749468896,
+            "neg": 0.6683527620377648
+        },
+        "total_recall": {
+            "pos": 0.5905148165261419,
+            "neg": 0.653295871733058
+        },
+        "total_f": {
+            "pos": 0.5822305855287989,
+            "neg": 0.6607385490270506
+        },
+        "max_precision": {
+            "pos": 0.7647058823529411,
+            "neg": 0.7692307692307693
+        },
+        "max_recall": {
+            "pos": 0.6842105263157895,
+            "neg": 0.8333333333333334
+        },
+        "max_f": {
+            "pos": 0.7222222222222222,
+            "neg": 0.8
+        },
+        "threshold_precision": {
+            "pos": 0.7142857142857143,
+            "neg": 0.8717948717948718
+        },
+        "threshold_recall": {
+            "pos": 0.3508771929824561,
+            "neg": 0.4722222222222222
+        },
+        "threshold_f": {
+            "pos": 0.4705882352941177,
+            "neg": 0.6126126126126126
+        },
+        "label_map": {
+            "pos": 0,
+            "neg": 1
+        }
+    }
+}
+```
+
 ### Temp Directory
+The temp directory `tmp/` is only used for temporary storage which does not need to be persisted across restarts
+
+One of the contents
+```json
+{"status": "Model Trained"}
+```
 
 ## API
 The API for classer should be consistent between what can be accessed via the Python Library and what can be accessed via the HTTP API
@@ -97,4 +199,23 @@ The API for classer should be consistent between what can be accessed via the Py
 - Recommend Training
 
 ### Model API
-### Experiment API
+- List Models
+- Benchmark Model
+- Get Benchmark Status
+
+### Experiments API
+- Run Experiment
+
+### Implementations API
+- List Implementations
+- List Loaded Implementations
+- Get Implementation
+- Modify Implementation
+- Re-implement
+- Create Implementation
+- Load Implementation
+- Unload Implementation
+- Save Implementation
+- Benchmark Implementation
+- Get Benchmark history
+
